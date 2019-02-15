@@ -27,9 +27,9 @@ public class Item {
     private
     ItemType itemType;
 
-    @Column
+    @Column(nullable = false)
     private
-    ItemSubType itemSubType;
+    ItemSubType itemSubType = ItemSubType.none;
 
     @Column
     private

@@ -14,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.transaction.Transaction;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ItemServiceTest {
@@ -22,7 +26,7 @@ public class ItemServiceTest {
     @Autowired
     ItemService itemService;
 
-    ObjectMapper objectMapper =new ObjectMapper();
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Before
     public void setUp() throws Exception {

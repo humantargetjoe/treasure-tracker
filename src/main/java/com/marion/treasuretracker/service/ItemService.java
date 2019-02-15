@@ -1,8 +1,10 @@
 package com.marion.treasuretracker.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marion.treasuretracker.InvalidItemException;
 import com.marion.treasuretracker.model.Item;
+import com.marion.treasuretracker.model.ItemType;
 import com.marion.treasuretracker.model.ItemValidator;
 import com.marion.treasuretracker.repository.ItemRepository;
 import org.apache.commons.logging.Log;
@@ -27,8 +29,13 @@ public class ItemService {
     @Autowired
     EntityManager entityManager;
 
+    ObjectMapper objectMapper = new ObjectMapper();
+
     public void createItem() {
         Item item = new Item();
+        item.setItemType(ItemType.weapon);
+        item.setName("Longsword");
+        item.setAmount(1);
 
         itemRepository.save(item);
     }
@@ -62,16 +69,13 @@ public class ItemService {
         itemRepository.save(item);
     }
 
-    public int totalValueInCoins() {
-        Query nativeQuery = entityManager.createNativeQuery("SELECT * FROM item;");
-        List<Object[]> coins = nativeQuery.getResultList();
+    public int totalValueInCoins() throws JsonProcessingException {
+        Query nativeQuery = entityManager.createNativeQuery("SELECT * FROM item;", Item.class);
+        List<Item> items = nativeQuery.getResultList();
 
-        for (Object[] a : coins) {
-            for(Object o: a){
-                if (o != null){
-                    log.info(o.toString());
-                }
-            }
+        for (Item item : items) {
+            log.info(objectMapper.writeValueAsString(item));
+
         }
         return 0;
     }
