@@ -8,61 +8,48 @@ import java.util.ArrayList;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private
-    Long id;
+    private Long id;
 
-    @Column(nullable = false)
-    private
-    String name;
+    @Column(name = "NAME", nullable = false)
+    private String name;
 
-    @Column
-    private
-    String description;
+    @Column(name = "DESCRIPTION")
+    private String description;
 
-    @Column
-    private
-    String source;
+    @Column(name = "SOURCE")
+    private String source;
 
-    @Column(nullable = false)
-    private
-    ItemType itemType;
+    @Column(name = "ITEMTYPE", nullable = false)
+    private ItemType itemType;
 
-    @Column(nullable = false)
-    private
-    ItemSubType itemSubType = ItemSubType.none;
+    @Column(name = "ITEMSUBTYPE", nullable = false)
+    private ItemSubType itemSubType = ItemSubType.none;
 
-    @Column
-    private
-    Integer weight;
+    @Column(name = "WEIGHT")
+    private Float weight;
 
-    @Column
-    private
-    Integer value;
+    @Column(name = "VALUE")
+    private Integer value;
 
-    @Column(nullable = false)
-    private
-    Integer amount;
+    @Column(name = "AMOUNT", nullable = false)
+    private Integer amount;
 
-    @Column
-    private
-    Integer width;
+    @Column(name = "WIDTH")
+    private Float width;
 
-    @Column
-    private
-    Integer length;
+    @Column(name = "LENGTH")
+    private Float length;
 
-    @Column
-    private
-    Integer height;
+    @Column(name = "HEIGHT")
+    private Float height;
 
-    @Column
-    private
-    ArrayList<String> tags = new ArrayList<>();
+    @Column(name = "TAGS")
+    private ArrayList<String> tags = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
         if (o instanceof Item && this.id != null) {
-            if (this.id.equals(((Item)o).id)) {
+            if (this.id.equals(((Item) o).id)) {
                 return true;
             }
         }
@@ -117,11 +104,11 @@ public class Item {
         this.itemSubType = itemSubType;
     }
 
-    public Integer getWeight() {
+    public Float getWeight() {
         return weight;
     }
 
-    public void setWeight(Integer weight) {
+    public void setWeight(Float weight) {
         this.weight = weight;
     }
 
@@ -133,27 +120,27 @@ public class Item {
         this.value = value;
     }
 
-    public Integer getWidth() {
+    public Float getWidth() {
         return width;
     }
 
-    public void setWidth(Integer width) {
+    public void setWidth(Float width) {
         this.width = width;
     }
 
-    public Integer getLength() {
+    public Float getLength() {
         return length;
     }
 
-    public void setLength(Integer length) {
+    public void setLength(Float length) {
         this.length = length;
     }
 
-    public Integer getHeight() {
+    public Float getHeight() {
         return height;
     }
 
-    public void setHeight(Integer height) {
+    public void setHeight(Float height) {
         this.height = height;
     }
 

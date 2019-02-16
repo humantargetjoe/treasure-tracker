@@ -17,7 +17,7 @@ import javax.persistence.Query;
 
 import java.util.List;
 
-import static com.marion.treasuretracker.model.Constants.coinsPerPound;
+import static com.marion.treasuretracker.model.Constants.poundsPerCoin;
 
 @Service
 public class ItemService {
@@ -48,7 +48,7 @@ public class ItemService {
         if (!ItemValidator.validateCoins(item)) {
             throw new InvalidItemException();
         }
-        item.setWeight(coinsPerPound * item.getAmount());
+        item.setWeight(poundsPerCoin * item.getAmount());
 
         itemRepository.save(item);
     }
@@ -69,14 +69,55 @@ public class ItemService {
         itemRepository.save(item);
     }
 
-    public int totalValueInCoins() throws JsonProcessingException {
-        Query nativeQuery = entityManager.createNativeQuery("SELECT * FROM item;", Item.class);
+    public List<Item> listItems() {
+        Query nativeQuery = entityManager.createNativeQuery("SELECT * FROM item", Item.class);
         List<Item> items = nativeQuery.getResultList();
 
-        for (Item item : items) {
-            log.info(objectMapper.writeValueAsString(item));
-
+        try {
+            for (Item item : items) {
+                log.info(objectMapper.writeValueAsString(item));
+            }
         }
-        return 0;
+        catch (JsonProcessingException jpEx) {
+            log.error(jpEx.getMessage(), jpEx);
+        }
+
+        return items;
+    }
+
+    public int totalCoinValue() {
+        Query nativeQuery = entityManager.createNativeQuery("SELECT * FROM item WHERE ITEMTYPE = 'coin';", Item.class);
+        List<Item> items = nativeQuery.getResultList();
+
+        float value=0;
+        try {
+            for (Item item : items) {
+                log.info(objectMapper.writeValueAsString(item));
+                switch (item.getItemSubType()) {
+                    case platinum:
+                        value += item.getAmount() * 10;
+                        break;
+                    case gold:
+                        value += item.getAmount();
+                        break;
+                    case electrum:
+                        value += item.getAmount() * 0.5;
+                        break;
+                    case silver:
+                        value += item.getAmount() * 0.1;
+                        break;
+                    case copper:
+                        value += item.getAmount() * 0.01;
+                        break;
+                        default:
+                            break;
+                }
+            }
+        }
+        catch (JsonProcessingException jpEx) {
+            log.error(jpEx.getMessage(), jpEx);
+        }
+
+        return (int) value;
     }
 }

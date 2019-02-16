@@ -7,16 +7,13 @@ import com.marion.treasuretracker.model.ItemSubType;
 import com.marion.treasuretracker.model.ItemType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.transaction.Transaction;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -141,8 +138,18 @@ public class ItemServiceTest {
     }
 
     @Test
-    public void testTotalValueInCoins() throws Exception{
-        testAddCoins();
-        itemService.totalValueInCoins();
+    public void testListItems() throws Exception {
+        itemService.listItems();
+    }
+
+    @Test
+    public void testTotalValueInCoins() throws Exception {
+        Item silverCoins = new Item();
+        silverCoins.setName("Silver Coin");
+        silverCoins.setAmount(50);
+        silverCoins.setItemType(ItemType.coin);
+        silverCoins.setItemSubType(ItemSubType.silver);
+        itemService.addCoins(silverCoins);
+        itemService.totalCoinValue();
     }
 }
