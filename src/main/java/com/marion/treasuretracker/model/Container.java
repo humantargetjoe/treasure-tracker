@@ -1,29 +1,41 @@
 package com.marion.treasuretracker.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name="container", schema = "public")
+@Table(name = "container", schema = "public")
 public class Container {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private
     Long id;
-    @Column(nullable = false)
+
+    @Column(name = "NAME", nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private Long maximumWeight;
-    @Column(nullable = false)
-    private Long maximumVolume;
-    @Column(nullable = false)
+    @Column(name = "MAX_WEIGHT", nullable = false)
+    private Float maximumWeight;
+
+    @Column(name = "MAX_VOLUME", nullable = false)
+    private Float maximumVolume;
+
+    @Column(name = "IS_EXTRADIMENSIONAL", nullable = false)
     private Boolean isExtraDimensional;
 
-    @Column
+    @Column(name = "WEIGHT", nullable = false)
+    private Float weight;
+
+    @Column(name = "WIDTH", nullable = false)
+    private Float width;
+
+    @Column(name = "LENGTH", nullable = false)
+    private Float length;
+
+    @Column(name = "HEIGHT", nullable = false)
+    private Float height;
+
+    @Column(name = "ITEMS")
     private ArrayList<Item> items;
 
     public Long getId() {
@@ -42,27 +54,27 @@ public class Container {
         this.name = name;
     }
 
-    public Long getMaximumWeight() {
+    public Float getMaximumWeight() {
         return maximumWeight;
     }
 
-    public void setMaximumWeight(Long maximumWeight) {
+    public void setMaximumWeight(Float maximumWeight) {
         this.maximumWeight = maximumWeight;
     }
 
-    public Long getMaximumVolume() {
+    public Float getMaximumVolume() {
         return maximumVolume;
     }
 
-    public void setMaximumVolume(Long maximumVolume) {
+    public void setMaximumVolume(Float maximumVolume) {
         this.maximumVolume = maximumVolume;
     }
 
-    public Boolean getExtraDimensional() {
+    public Boolean getIsExtraDimensional() {
         return isExtraDimensional;
     }
 
-    public void setExtraDimensional(Boolean extraDimensional) {
+    public void setIsExtraDimensional(Boolean extraDimensional) {
         isExtraDimensional = extraDimensional;
     }
 
@@ -72,5 +84,37 @@ public class Container {
 
     public void setItems(ArrayList<Item> items) {
         this.items = items;
+    }
+
+    public Float getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Float weight) {
+        this.weight = weight;
+    }
+
+    public Float getWidth() {
+        return width;
+    }
+
+    public void setWidth(Float width) {
+        this.width = width;
+    }
+
+    public Float getLength() {
+        return length;
+    }
+
+    public void setLength(Float length) {
+        this.length = length;
+    }
+
+    public Float getHeight() {
+        return height;
+    }
+
+    public void setHeight(Float height) {
+        this.height = height;
     }
 }
