@@ -2,11 +2,15 @@ package com.marion.treasuretracker.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.marion.treasuretracker.exceptions.InvalidContainerException;
+import com.marion.treasuretracker.exceptions.InvalidItemException;
 import com.marion.treasuretracker.model.Container;
+import com.marion.treasuretracker.model.DataValidator;
 import com.marion.treasuretracker.model.Item;
 import com.marion.treasuretracker.repository.ContainerRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,17 +30,11 @@ public class ContainerService {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    public void createContainer() {
-        Container container = new Container();
-        container.setName("Wooden Chest");
-        container.setMaximumVolume(12f);
-        container.setMaximumWeight(300f);
-        container.setIsExtraDimensional(false);
-        container.setWeight(25f);
-        container.setHeight(2f);
-        container.setWidth(2f);
-        container.setLength(3f);
-        containerRepository.save(container);
+    public Container createContainer(Container container) throws InvalidContainerException {
+        if(!DataValidator.validateContainer(container)) {
+            throw new InvalidContainerException();        }
+
+        return containerRepository.save(container);
     }
 
     public List<Container> listContainers() {

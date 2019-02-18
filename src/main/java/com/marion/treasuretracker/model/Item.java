@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Integer id;
 
     @Column(name = "NAME", nullable = false)
     private String name;
@@ -56,11 +56,11 @@ public class Item {
         return false;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

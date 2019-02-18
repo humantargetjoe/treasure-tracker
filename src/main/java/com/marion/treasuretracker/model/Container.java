@@ -2,6 +2,7 @@ package com.marion.treasuretracker.model;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "container", schema = "public")
@@ -13,6 +14,9 @@ public class Container {
 
     @Column(name = "NAME", nullable = false)
     private String name;
+
+    @Column(name = "DESCRIPTION", nullable = false)
+    private String description;
 
     @Column(name = "MAX_WEIGHT", nullable = false)
     private Float maximumWeight;
@@ -36,7 +40,8 @@ public class Container {
     private Float height;
 
     @Column(name = "ITEMS")
-    private ArrayList<Item> items;
+    @OneToMany
+    private List<Item> items;
 
     public Long getId() {
         return id;
@@ -78,11 +83,11 @@ public class Container {
         isExtraDimensional = extraDimensional;
     }
 
-    public ArrayList<Item> getItems() {
+    public List<Item> getItems() {
         return items;
     }
 
-    public void setItems(ArrayList<Item> items) {
+    public void setItems(List<Item> items) {
         this.items = items;
     }
 
@@ -116,5 +121,13 @@ public class Container {
 
     public void setHeight(Float height) {
         this.height = height;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

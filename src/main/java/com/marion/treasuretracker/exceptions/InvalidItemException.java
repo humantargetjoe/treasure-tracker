@@ -1,4 +1,4 @@
-package com.marion.treasuretracker;
+package com.marion.treasuretracker.exceptions;
 
 public class InvalidItemException extends Exception {
     public InvalidItemException() {
