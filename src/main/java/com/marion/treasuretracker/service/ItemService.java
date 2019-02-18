@@ -2,10 +2,9 @@ package com.marion.treasuretracker.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marion.treasuretracker.InvalidItemException;
+import com.marion.treasuretracker.exceptions.InvalidItemException;
 import com.marion.treasuretracker.model.Item;
-import com.marion.treasuretracker.model.ItemType;
-import com.marion.treasuretracker.model.ItemValidator;
+import com.marion.treasuretracker.model.DataValidator;
 import com.marion.treasuretracker.repository.ItemRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-
 import java.util.List;
 
 import static com.marion.treasuretracker.model.Constants.poundsPerCoin;
@@ -31,42 +29,55 @@ public class ItemService {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    public void createItem() {
-        Item item = new Item();
-        item.setItemType(ItemType.weapon);
-        item.setName("Longsword");
-        item.setAmount(1);
-
-        itemRepository.save(item);
+    public Item createItem(Item item) throws InvalidItemException {
+        switch (item.getItemType()) {
+            case coin:
+                return addCoins(item);
+            case gem:
+                return addGems(item);
+            case jewelry:
+                return addJewelry(item);
+            default:
+                return addItem(item);
+        }
     }
 
-    public void editItem(Item item) {
+    public Item updateItem(Item item) throws InvalidItemException {
+        createItem(item);
 
+        return item;
     }
 
-    public void addCoins(Item item) throws InvalidItemException {
-        if (!ItemValidator.validateCoins(item)) {
+    private Item addItem(Item item) throws InvalidItemException {
+        if (!DataValidator.validateItem(item)) {
+            throw new InvalidItemException();
+        }
+        return itemRepository.save(item);
+    }
+
+    Item addCoins(Item item) throws InvalidItemException {
+        if (!DataValidator.validateCoins(item)) {
             throw new InvalidItemException();
         }
         item.setWeight(poundsPerCoin * item.getAmount());
 
-        itemRepository.save(item);
+        return itemRepository.save(item);
     }
 
-    public void addGems(Item item) throws InvalidItemException {
-        if (!ItemValidator.validateGems(item)) {
+    Item addGems(Item item) throws InvalidItemException {
+        if (!DataValidator.validateGems(item)) {
             throw new InvalidItemException();
         }
 
-        itemRepository.save(item);
+        return itemRepository.save(item);
     }
 
-    public void addJewelry(Item item) throws InvalidItemException {
-        if (!ItemValidator.validateJewelry(item)) {
+    Item addJewelry(Item item) throws InvalidItemException {
+        if (!DataValidator.validateJewelry(item)) {
             throw new InvalidItemException();
         }
 
-        itemRepository.save(item);
+        return itemRepository.save(item);
     }
 
     public List<Item> listItems() {
@@ -77,8 +88,7 @@ public class ItemService {
             for (Item item : items) {
                 log.info(objectMapper.writeValueAsString(item));
             }
-        }
-        catch (JsonProcessingException jpEx) {
+        } catch (JsonProcessingException jpEx) {
             log.error(jpEx.getMessage(), jpEx);
         }
 
@@ -89,7 +99,7 @@ public class ItemService {
         Query nativeQuery = entityManager.createNativeQuery("SELECT * FROM item WHERE ITEMTYPE = 'coin';", Item.class);
         List<Item> items = nativeQuery.getResultList();
 
-        float value=0;
+        float value = 0.0f;
         try {
             for (Item item : items) {
                 log.info(objectMapper.writeValueAsString(item));
@@ -109,12 +119,11 @@ public class ItemService {
                     case copper:
                         value += item.getAmount() * 0.01;
                         break;
-                        default:
-                            break;
+                    default:
+                        break;
                 }
             }
-        }
-        catch (JsonProcessingException jpEx) {
+        } catch (JsonProcessingException jpEx) {
             log.error(jpEx.getMessage(), jpEx);
         }
 

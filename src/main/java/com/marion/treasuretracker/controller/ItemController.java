@@ -21,7 +21,6 @@ public class ItemController {
 
     @RequestMapping(value = "/add-item", method = RequestMethod.GET)
     public String addItem(ModelMap model) {
-        itemService.createItem();
         model.put("items", itemService.listItems());
         return "list-items";
     }

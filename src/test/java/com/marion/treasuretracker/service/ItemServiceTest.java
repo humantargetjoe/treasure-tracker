@@ -1,7 +1,7 @@
 package com.marion.treasuretracker.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marion.treasuretracker.InvalidItemException;
+import com.marion.treasuretracker.exceptions.InvalidItemException;
 import com.marion.treasuretracker.model.Item;
 import com.marion.treasuretracker.model.ItemSubType;
 import com.marion.treasuretracker.model.ItemType;
@@ -9,14 +9,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ItemServiceTest {
     private static Log log = LogFactory.getLog(ItemServiceTest.class);
 
@@ -29,9 +34,24 @@ public class ItemServiceTest {
     public void setUp() throws Exception {
     }
 
+    @Rule
+    public TestWatcher watcher = new TestWatcher() {
+        public void starting(Description description) {
+            log.info("Starting test " + description.getMethodName());
+        }
+    };
+
     @Test
-    public void testCreateItem() {
-        itemService.createItem();
+    public void testCreateItem() throws Exception {
+        Item item = new Item();
+        item.setName("Longsword");
+        item.setItemType(ItemType.weapon);
+        item.setItemSubType(ItemSubType.none);
+        item.setAmount(1);
+        Item result = itemService.createItem(item);
+
+        Assert.assertEquals("Names don't match", item.getName(), result.getName());
+        Assert.assertEquals("ID hasn't been updated", item.getId(), result.getId());
     }
 
     @Test
@@ -150,6 +170,8 @@ public class ItemServiceTest {
         silverCoins.setItemType(ItemType.coin);
         silverCoins.setItemSubType(ItemSubType.silver);
         itemService.addCoins(silverCoins);
-        itemService.totalCoinValue();
+        int value = itemService.totalCoinValue();
+
+        Assert.assertEquals("Total Value in GP incorrect", 5, value);
     }
 }
