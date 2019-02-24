@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContainerService {
@@ -26,40 +27,73 @@ public class ContainerService {
     ContainerRepository containerRepository;
 
     @Autowired
+    ChangeLogService changeLogService;
+
+    @Autowired
     EntityManager entityManager;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
     public Container createContainer(Container container) throws InvalidContainerException {
-        if(!DataValidator.validateContainer(container)) {
-            throw new InvalidContainerException();        }
+        if (!DataValidator.validateContainer(container)) {
+            throw new InvalidContainerException();
+        }
 
-        return containerRepository.save(container);
+        containerRepository.save(container);
+        changeLogService.recordAcquiredContainer("created", container);
+
+        return container;
     }
 
-    public List<Container> listContainers() {
-        Query nativeQuery = entityManager.createNativeQuery("SELECT * FROM container", Container.class);
+    public Container updateContainer(Container container) throws InvalidContainerException {
+        if (!DataValidator.validateContainer(container)) {
+            throw new InvalidContainerException();
+        }
+
+        containerRepository.save(container);
+        changeLogService.recordUpdateContainer("updated", container);
+
+        return container;
+    }
+
+    public Container findContainerById(String id) {
+        Optional<Container> result = containerRepository.findById(Integer.parseInt(id));
+
+        if (result.isPresent()) {
+            return result.get();
+        }
+        return null;
+    }
+
+    public List<Container> queryContainers(String query) {
+        Query nativeQuery = entityManager.createNativeQuery(query, Container.class);
         List<Container> containers = nativeQuery.getResultList();
 
         try {
-            for (Container item : containers) {
-                log.info(objectMapper.writeValueAsString(item));
+            for (Container container : containers) {
+                log.info(objectMapper.writeValueAsString(container));
             }
-        }
-        catch (JsonProcessingException jpEx) {
+        } catch (JsonProcessingException jpEx) {
             log.error(jpEx.getMessage(), jpEx);
         }
 
         return containers;
     }
 
+    public List<Container> listContainers() {
+        String query = "SELECT * FROM container";
+        return queryContainers(query);
+    }
+
     public void addItemToContainer(Container container, Item item) {
         container.getItems().add(item);
         containerRepository.save(container);
+        changeLogService.recordMoveItemContainer("Added", item, container);
     }
 
     public void removeItemFromContainer(Container container, Item item) {
         container.getItems().remove(item);
         containerRepository.save(container);
+        changeLogService.recordMoveItemContainer("Removed", item, container);
     }
 }

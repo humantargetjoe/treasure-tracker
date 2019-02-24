@@ -3,8 +3,8 @@ package com.marion.treasuretracker.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marion.treasuretracker.exceptions.InvalidItemException;
-import com.marion.treasuretracker.model.Item;
 import com.marion.treasuretracker.model.DataValidator;
+import com.marion.treasuretracker.model.Item;
 import com.marion.treasuretracker.repository.ItemRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.List;
+import java.util.Optional;
 
 import static com.marion.treasuretracker.model.Constants.poundsPerCoin;
 
@@ -25,63 +26,87 @@ public class ItemService {
     ItemRepository itemRepository;
 
     @Autowired
+    ChangeLogService changeLogService;
+
+    @Autowired
     EntityManager entityManager;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
-    public Item createItem(Item item) throws InvalidItemException {
+    private void validateAndSave(Item item) throws InvalidItemException {
         switch (item.getItemType()) {
             case coin:
-                return addCoins(item);
+                addCoins(item);
             case gem:
-                return addGems(item);
+                addGems(item);
             case jewelry:
-                return addJewelry(item);
+                addJewelry(item);
             default:
-                return addItem(item);
+                addItem(item);
         }
     }
 
-    public Item updateItem(Item item) throws InvalidItemException {
-        createItem(item);
+    public Item createItem(Item item) throws InvalidItemException {
+        validateAndSave(item);
+        changeLogService.recordAcquiredItem("Some description", item);
 
         return item;
     }
 
-    private Item addItem(Item item) throws InvalidItemException {
+    public Item updateItem(Item item) throws InvalidItemException {
+        if (item.getId() == null) {
+            throw new InvalidItemException("Item does not exist.");
+        }
+
+        validateAndSave(item);
+        changeLogService.recordUpdateItem("Some description", item);
+
+        return item;
+    }
+
+    private void addItem(Item item) throws InvalidItemException {
         if (!DataValidator.validateItem(item)) {
             throw new InvalidItemException();
         }
-        return itemRepository.save(item);
+        itemRepository.save(item);
     }
 
-    Item addCoins(Item item) throws InvalidItemException {
+    void addCoins(Item item) throws InvalidItemException {
         if (!DataValidator.validateCoins(item)) {
             throw new InvalidItemException();
         }
         item.setWeight(poundsPerCoin * item.getAmount());
 
-        return itemRepository.save(item);
+        itemRepository.save(item);
     }
 
-    Item addGems(Item item) throws InvalidItemException {
+    void addGems(Item item) throws InvalidItemException {
         if (!DataValidator.validateGems(item)) {
             throw new InvalidItemException();
         }
 
-        return itemRepository.save(item);
+        itemRepository.save(item);
     }
 
-    Item addJewelry(Item item) throws InvalidItemException {
+    void addJewelry(Item item) throws InvalidItemException {
         if (!DataValidator.validateJewelry(item)) {
             throw new InvalidItemException();
         }
 
-        return itemRepository.save(item);
+        itemRepository.save(item);
     }
 
-    public List<Item> listItems() {
-        Query nativeQuery = entityManager.createNativeQuery("SELECT * FROM item", Item.class);
+    public Item findItemById(String id) {
+        Optional<Item> result = itemRepository.findById(Integer.parseInt(id));
+
+        if (result.isPresent()) {
+            return result.get();
+        }
+        return null;
+    }
+
+    public List<Item> queryItems(String query) {
+        Query nativeQuery = entityManager.createNativeQuery(query, Item.class);
         List<Item> items = nativeQuery.getResultList();
 
         try {
@@ -93,6 +118,11 @@ public class ItemService {
         }
 
         return items;
+    }
+
+    public List<Item> listItems() {
+        String query = "SELECT * FROM item";
+        return queryItems(query);
     }
 
     public int totalCoinValue() {
