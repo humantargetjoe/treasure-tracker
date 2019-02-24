@@ -31,6 +31,7 @@ public class ContainerServiceTest {
     public void testCreateContainer() throws Exception {
         Container container = new Container();
         container.setName("Wooden Chest");
+        container.setDescription("Purchased in Hommlet.  Secured with a DC 20 Pad Lock.");
         container.setMaximumVolume(12f);
         container.setMaximumWeight(300f);
         container.setIsExtraDimensional(false);
@@ -48,6 +49,7 @@ public class ContainerServiceTest {
     public void testListContainers() throws Exception {
         Container container = new Container();
         container.setName("Bag of Holding");
+        container.setDescription("Would you believe we destroyed it, then wished for it back from an Efreeti?");
         container.setMaximumWeight(500f);
         container.setMaximumVolume(64f);
         container.setIsExtraDimensional(true);

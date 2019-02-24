@@ -41,7 +41,7 @@ public class Container {
 
     @Column(name = "ITEMS")
     @OneToMany
-    private List<Item> items;
+    private List<Item> items = new ArrayList<>();
 
     public Long getId() {
         return id;
