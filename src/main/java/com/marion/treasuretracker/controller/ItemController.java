@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,12 @@ public class ItemController {
 
     @Autowired
     ItemService itemService;
+
+    @RequestMapping(value = "/list-items", method = RequestMethod.GET)
+    public String listItems(ModelMap model) {
+        model.addAttribute("items", itemService.listItems());
+        return "list-items";
+    }
 
     @RequestMapping(value = "/api/item", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<?> createItem(@RequestBody Item item) {

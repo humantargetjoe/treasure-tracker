@@ -19,6 +19,11 @@ public class ContainerController {
     @Autowired
     ContainerService containerService;
 
+    @RequestMapping(value = "/list-containers", method = RequestMethod.GET)
+    public String listItems(ModelMap model) {
+        model.addAttribute("containers", containerService.listContainers());
+        return "list-containers";
+    }
 
     @RequestMapping(value = "/api/container", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<?> createContainer(@RequestBody Container container) {
