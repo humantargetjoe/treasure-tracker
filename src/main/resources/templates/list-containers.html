@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <title>Treasure Tracker</title>
+    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+<body>
+
+<div class="container">
+    <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
+
+    <div th:if="${not #lists.isEmpty(containers)}">
+        <table class="table table-striped">
+            <caption>Containers</caption>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Maximum Weight</th>
+                <th>Maximum Volume</th>
+                <th>Extradimensional</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>Length</th>
+                <th>Weight</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="container : ${containers}">
+                <td th:text="${container.name}"></td>
+                <td th:text="${container.maximumWeight}"></td>
+                <td th:text="${container.maximumVolume}"></td>
+                <td th:text="${container.isExtraDimensional}"></td>
+                <td th:text="${container.width}"></td>
+                <td th:text="${container.height}"></td>
+                <td th:text="${container.length}"></td>
+                <td th:text="${container.weight}"></td>
+                <td th:text="${container.description}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <div>
+            <a class="button" href="/add-container">Add a Container</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

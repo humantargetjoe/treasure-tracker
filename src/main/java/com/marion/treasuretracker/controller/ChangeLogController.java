@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,12 @@ public class ChangeLogController {
 
     @Autowired
     ChangeLogService changeLogService;
+
+    @RequestMapping(value = "/list-logs", method = RequestMethod.GET)
+    public String listItems(ModelMap model) {
+        model.addAttribute("logs", changeLogService.listChangeLog());
+        return "list-logs";
+    }
 
     @RequestMapping(value = "/api/log", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<?> queryItems(@RequestParam("query") String query) {
