@@ -23,8 +23,9 @@
                 <th>Width</th>
                 <th>Length</th>
                 <th>Weight</th>
-                <th>Value</th>
+                <th>Source</th>
                 <th>Tags</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -39,8 +40,9 @@
                 <td th:text="${item.width}"></td>
                 <td th:text="${item.length}"></td>
                 <td th:text="${item.weight}"></td>
-                <td th:text="${item.value}"></td>
+                <td th:text="${item.source}"></td>
                 <td th:text="${item.tags}"></td>
+                <td><a th:href="${'/edit-item/' + item.id}">edit</a></td>
             </tr>
             </tbody>
         </table>

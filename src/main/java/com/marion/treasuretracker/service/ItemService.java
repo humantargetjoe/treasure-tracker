@@ -37,16 +37,26 @@ public class ItemService {
         switch (item.getItemType()) {
             case coin:
                 addCoins(item);
+                break;
+
             case gem:
                 addGems(item);
+                break;
+
             case jewelry:
                 addJewelry(item);
+                break;
+
             default:
                 addItem(item);
         }
     }
 
     public Item createItem(Item item) throws InvalidItemException {
+        if (item.getId() != null) {
+            return updateItem(item);
+        }
+
         validateAndSave(item);
         changeLogService.recordAcquiredItem("Some description", item);
 
@@ -97,7 +107,11 @@ public class ItemService {
     }
 
     public Item findItemById(String id) {
-        Optional<Item> result = itemRepository.findById(Integer.parseInt(id));
+        return findItemById(Integer.parseInt(id));
+    }
+
+    public Item findItemById(Integer id) {
+        Optional<Item> result = itemRepository.findById(id);
 
         if (result.isPresent()) {
             return result.get();
