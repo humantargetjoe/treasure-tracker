@@ -39,6 +39,14 @@ public class ItemController {
         return "add-item";
     }
 
+    @RequestMapping(value = "/edit-item/{id}", method = RequestMethod.GET)
+    public String editItem(@PathVariable Integer id, ModelMap model) {
+        model.addAttribute("item", itemService.findItemById(id));
+        model.addAttribute("itemTypes", ItemType.values());
+        model.addAttribute("itemSubTypes", ItemSubType.values());
+        return "add-item";
+    }
+
     @RequestMapping(value = "item/create", method = RequestMethod.POST)
     public String saveProduct(Item item) throws Exception {
         log.info(objectMapper.writeValueAsString(item));

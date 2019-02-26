@@ -6,4 +6,7 @@ public enum ItemType {
     jewelry,
     weapon,
     armor,
+    potion,
+    scroll,
+    other,
 }
