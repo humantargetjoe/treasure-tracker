@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head lang="en">
-    <title>Treasure Tracker</title>
     <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
 <body>
 
@@ -22,6 +21,7 @@
                 <th>Length</th>
                 <th>Weight</th>
                 <th>Description</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -35,6 +35,7 @@
                 <td th:text="${container.length}"></td>
                 <td th:text="${container.weight}"></td>
                 <td th:text="${container.description}"></td>
+                <td><a th:href="${'/edit-container/' + container.id}">edit</a></td>
             </tr>
             </tbody>
         </table>
