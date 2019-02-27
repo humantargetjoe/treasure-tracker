@@ -57,7 +57,11 @@ public class ContainerService {
     }
 
     public Container findContainerById(String id) {
-        Optional<Container> result = containerRepository.findById(Integer.parseInt(id));
+        return findContainerById(Integer.parseInt(id));
+    }
+
+    public Container findContainerById(Integer id) {
+        Optional<Container> result = containerRepository.findById(id);
 
         if (result.isPresent()) {
             return result.get();

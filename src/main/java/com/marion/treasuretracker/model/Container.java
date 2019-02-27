@@ -10,7 +10,7 @@ public class Container {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private
-    Long id;
+    Integer id;
 
     @Column(name = "NAME", nullable = false)
     private String name;
@@ -43,11 +43,11 @@ public class Container {
     @OneToMany
     private List<Item> items = new ArrayList<>();
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

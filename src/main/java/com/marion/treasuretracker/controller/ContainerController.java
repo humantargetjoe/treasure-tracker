@@ -1,8 +1,11 @@
 package com.marion.treasuretracker.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marion.treasuretracker.model.Container;
 import com.marion.treasuretracker.model.Container;
 import com.marion.treasuretracker.service.ContainerService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +18,35 @@ import java.util.List;
 
 @Controller
 public class ContainerController {
+    private static Log log = LogFactory.getLog(ContainerController.class);
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     ContainerService containerService;
 
     @RequestMapping(value = "/list-containers", method = RequestMethod.GET)
-    public String listItems(ModelMap model) {
+    public String listContainers(ModelMap model) {
         model.addAttribute("containers", containerService.listContainers());
         return "list-containers";
+    }
+
+    @RequestMapping(value = "/add-container", method = RequestMethod.GET)
+    public String addContainer(ModelMap model) {
+        model.addAttribute("container", new Container());
+        return "add-container";
+    }
+
+    @RequestMapping(value = "/edit-container/{id}", method = RequestMethod.GET)
+    public String editContainer(@PathVariable Integer id, ModelMap model) {
+        model.addAttribute("container", containerService.findContainerById(id));
+        return "add-container";
+    }
+
+    @RequestMapping(value = "container/create", method = RequestMethod.POST)
+    public String saveProduct(Container container) throws Exception {
+        log.info(objectMapper.writeValueAsString(container));
+        containerService.createContainer(container);
+        return "redirect:/list-containers";
     }
 
     @RequestMapping(value = "/api/container", method = RequestMethod.POST, produces = "application/json")
