@@ -46,6 +46,10 @@ public class Item {
     @Column(name = "TAGS")
     private ArrayList<String> tags = new ArrayList<>();
 
+    @JoinColumn(name = "CONTAINER")
+    @ManyToOne
+    private Container container;
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof Item && this.id != null) {
@@ -158,5 +162,13 @@ public class Item {
 
     public void setAmount(Integer amount) {
         this.amount = amount;
+    }
+
+    public Container getContainer() {
+        return container;
+    }
+
+    public void setContainer(Container container) {
+        this.container = container;
     }
 }

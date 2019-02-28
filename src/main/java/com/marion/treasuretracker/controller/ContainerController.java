@@ -49,6 +49,13 @@ public class ContainerController {
         return "redirect:/list-containers";
     }
 
+    @RequestMapping(value = "container/add/{id}", method = RequestMethod.POST)
+    public String addItemToContainer(@PathVariable Integer id, Container container, ModelMap model) throws Exception {
+
+        containerService.addItemToContainer(container, id);
+        return "redirect:/list-containers";
+    }
+
     @RequestMapping(value = "/api/container", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<?> createContainer(@RequestBody Container container) {
         Container result;

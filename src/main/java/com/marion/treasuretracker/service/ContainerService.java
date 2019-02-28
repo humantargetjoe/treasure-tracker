@@ -27,6 +27,9 @@ public class ContainerService {
     ContainerRepository containerRepository;
 
     @Autowired
+    ItemService itemService;
+
+    @Autowired
     ChangeLogService changeLogService;
 
     @Autowired
@@ -89,13 +92,21 @@ public class ContainerService {
         return queryContainers(query);
     }
 
-    public void addItemToContainer(Container container, Item item) {
+    public void addItemToContainer(Container container, Integer item) throws Exception {
+        addItemToContainer(container, itemService.findItemById(item));
+    }
+
+    private void addItemToContainer(Container container, Item item) throws Exception {
         container.getItems().add(item);
         containerRepository.save(container);
         changeLogService.recordMoveItemContainer("Added", item, container);
     }
 
-    public void removeItemFromContainer(Container container, Item item) {
+    public void removeItemToContainer(Container container, Integer item) throws Exception {
+        removeItemFromContainer(container, itemService.findItemById(item));
+    }
+
+    private void removeItemFromContainer(Container container, Item item) {
         container.getItems().remove(item);
         containerRepository.save(container);
         changeLogService.recordMoveItemContainer("Removed", item, container);
