@@ -43,6 +43,8 @@ public class Container {
     @OneToMany
     private List<Item> items = new ArrayList<>();
 
+    private Float currentWeight;
+
     public Integer getId() {
         return id;
     }
@@ -129,5 +131,13 @@ public class Container {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Float getCurrentWeight() {
+        return currentWeight;
+    }
+
+    public void setCurrentWeight(Float currentWeight) {
+        this.currentWeight = currentWeight;
     }
 }

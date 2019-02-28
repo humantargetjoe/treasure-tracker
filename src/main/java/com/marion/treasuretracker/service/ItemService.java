@@ -3,8 +3,7 @@ package com.marion.treasuretracker.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marion.treasuretracker.exceptions.InvalidItemException;
-import com.marion.treasuretracker.model.DataValidator;
-import com.marion.treasuretracker.model.Item;
+import com.marion.treasuretracker.model.*;
 import com.marion.treasuretracker.repository.ItemRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,7 +30,7 @@ public class ItemService {
     @Autowired
     EntityManager entityManager;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     private void validateAndSave(Item item) throws InvalidItemException {
         switch (item.getItemType()) {
@@ -58,7 +57,7 @@ public class ItemService {
         }
 
         validateAndSave(item);
-        changeLogService.recordAcquiredItem("Some description", item);
+        changeLogService.recordAcquiredItem("Acquisition Description", item);
 
         return item;
     }
@@ -68,8 +67,10 @@ public class ItemService {
             throw new InvalidItemException("Item does not exist.");
         }
 
+        Item previous = findItemById(item.getId());
+        changeLogService.recordUpdateItem(previous, item);
+
         validateAndSave(item);
-        changeLogService.recordUpdateItem("Some description", item);
 
         return item;
     }
@@ -85,6 +86,7 @@ public class ItemService {
         if (!DataValidator.validateCoins(item)) {
             throw new InvalidItemException();
         }
+        item.setValue(convertToGold(item.getItemSubType(), item.getAmount()));
         item.setWeight(poundsPerCoin * item.getAmount());
 
         itemRepository.save(item);
@@ -139,38 +141,33 @@ public class ItemService {
         return queryItems(query);
     }
 
-    public int totalCoinValue() {
-        Query nativeQuery = entityManager.createNativeQuery("SELECT * FROM item WHERE ITEMTYPE = 'coin';", Item.class);
-        List<Item> items = nativeQuery.getResultList();
+    public float totalCoinValue() {
+        List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE, ItemType.coin));
 
         float value = 0.0f;
         try {
             for (Item item : items) {
                 log.info(objectMapper.writeValueAsString(item));
-                switch (item.getItemSubType()) {
-                    case platinum:
-                        value += item.getAmount() * 10;
-                        break;
-                    case gold:
-                        value += item.getAmount();
-                        break;
-                    case electrum:
-                        value += item.getAmount() * 0.5;
-                        break;
-                    case silver:
-                        value += item.getAmount() * 0.1;
-                        break;
-                    case copper:
-                        value += item.getAmount() * 0.01;
-                        break;
-                    default:
-                        break;
-                }
+                value += convertToGold(item.getItemSubType(), item.getAmount());
             }
         } catch (JsonProcessingException jpEx) {
             log.error(jpEx.getMessage(), jpEx);
         }
 
-        return (int) value;
+        return value;
+    }
+
+    private static float convertToGold(ItemSubType subType, int amount) {
+        switch (subType) {
+            case platinum:
+                return amount * Constants.goldPerPlatinum;
+            case electrum:
+                return amount * Constants.goldPerElectrum;
+            case silver:
+                return amount * Constants.goldPerSilver;
+            case copper:
+                return amount * Constants.goldPerCopper;
+        }
+        return amount;
     }
 }

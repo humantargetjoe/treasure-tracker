@@ -170,8 +170,8 @@ public class ItemServiceTest {
         silverCoins.setItemType(ItemType.coin);
         silverCoins.setItemSubType(ItemSubType.silver);
         itemService.addCoins(silverCoins);
-        int value = itemService.totalCoinValue();
+        float value = itemService.totalCoinValue();
 
-        Assert.assertEquals("Total Value in GP incorrect", 5, value);
+        Assert.assertEquals("Total Value in GP incorrect", 5f, value, 0.001);
     }
 }
