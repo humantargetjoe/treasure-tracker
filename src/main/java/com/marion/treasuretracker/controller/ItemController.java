@@ -60,6 +60,13 @@ public class ItemController {
         itemService.createItem(item);
         return "redirect:/list-items";
     }
+    @RequestMapping(value = "/container/{id}/items", method = RequestMethod.GET)
+    public String itemsInContainer(@PathVariable Integer id, ModelMap model) {
+        model.addAttribute("items", itemService.queryItems(String.format("SELECT * FROM item WHERE item.CONTAINER = %d", id)));
+        model.addAttribute("containers", containerService.listContainers());
+        return "list-items";
+    }
+
 
     @RequestMapping(value = "/api/item", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<?> createItem(@RequestBody Item item) {
