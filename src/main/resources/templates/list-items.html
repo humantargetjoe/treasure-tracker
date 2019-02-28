@@ -24,6 +24,7 @@
                 <th>Weight</th>
                 <th>Source</th>
                 <th>Tags</th>
+                <th>Container</th>
                 <th></th>
             </tr>
             </thead>
@@ -41,6 +42,8 @@
                 <td th:text="${item.weight}"></td>
                 <td th:text="${item.source}"></td>
                 <td th:text="${item.tags}"></td>
+                <td th:if="${item.container != null}" th:text="${item.container.name}"></td>
+                <td th:unless="${item.container != null}"></td>
                 <td><a th:href="${'/edit-item/' + item.id}">edit</a></td>
             </tr>
             </tbody>

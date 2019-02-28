@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marion.treasuretracker.model.Item;
 import com.marion.treasuretracker.model.ItemSubType;
 import com.marion.treasuretracker.model.ItemType;
+import com.marion.treasuretracker.service.ContainerService;
 import com.marion.treasuretracker.service.ItemService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,9 +26,13 @@ public class ItemController {
     @Autowired
     ItemService itemService;
 
+    @Autowired
+    ContainerService containerService;
+
     @RequestMapping(value = "/list-items", method = RequestMethod.GET)
     public String listItems(ModelMap model) {
         model.addAttribute("items", itemService.listItems());
+        model.addAttribute("containers", containerService.listContainers());
         return "list-items";
     }
 
@@ -36,6 +41,7 @@ public class ItemController {
         model.addAttribute("item", new Item());
         model.addAttribute("itemTypes", ItemType.values());
         model.addAttribute("itemSubTypes", ItemSubType.values());
+        model.addAttribute("containers", containerService.listContainers());
         return "add-item";
     }
 
@@ -44,6 +50,7 @@ public class ItemController {
         model.addAttribute("item", itemService.findItemById(id));
         model.addAttribute("itemTypes", ItemType.values());
         model.addAttribute("itemSubTypes", ItemSubType.values());
+        model.addAttribute("containers", containerService.listContainers());
         return "add-item";
     }
 
