@@ -22,6 +22,7 @@
                 <th>Weight</th>
                 <th>Description</th>
                 <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -35,6 +36,7 @@
                 <td th:text="${container.length}"></td>
                 <td th:text="${container.weight}"></td>
                 <td th:text="${container.description}"></td>
+                <td><a th:href="${'/container/' + container.id + '/items/'}">items</a></td>
                 <td><a th:href="${'/edit-container/' + container.id}">edit</a></td>
             </tr>
             </tbody>
