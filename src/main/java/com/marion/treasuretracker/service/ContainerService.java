@@ -53,8 +53,9 @@ public class ContainerService {
             throw new InvalidContainerException();
         }
 
+        Container previous = findContainerById(container.getId());
         containerRepository.save(container);
-        changeLogService.recordUpdateContainer("updated", container);
+        changeLogService.recordUpdateContainer(previous, container);
 
         return container;
     }
@@ -99,16 +100,16 @@ public class ContainerService {
     private void addItemToContainer(Container container, Item item) throws Exception {
         container.getItems().add(item);
         containerRepository.save(container);
-        changeLogService.recordMoveItemContainer("Added", item, container);
+        changeLogService.recordMoveItemContainer("Added", item);
     }
 
-    public void removeItemToContainer(Container container, Integer item) throws Exception {
+    public void removeItemFromContainer(Container container, Integer item) throws Exception {
         removeItemFromContainer(container, itemService.findItemById(item));
     }
 
     private void removeItemFromContainer(Container container, Item item) {
         container.getItems().remove(item);
         containerRepository.save(container);
-        changeLogService.recordMoveItemContainer("Removed", item, container);
+        changeLogService.recordMoveItemContainer("Removed", item);
     }
 }

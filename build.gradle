@@ -31,6 +31,7 @@ dependencies {
     compile group: "javax.servlet", name: "jstl"
     compile group: 'org.apache.tomcat.embed', name:'tomcat-embed-jasper'
     runtime group: "com.h2database", name: "h2"
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.8'
 
     // 3.3.7 probably latest version of 3
     implementation group: "org.webjars", name: "bootstrap", version: "3.3.4"

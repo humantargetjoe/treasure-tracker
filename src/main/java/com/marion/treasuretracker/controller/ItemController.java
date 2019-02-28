@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller()
+@Controller
 public class ItemController {
     private static Log log = LogFactory.getLog(ItemController.class);
     ObjectMapper objectMapper = new ObjectMapper();
@@ -38,6 +38,7 @@ public class ItemController {
 
     @RequestMapping(value = "/add-item", method = RequestMethod.GET)
     public String addItem(ModelMap model) {
+        model.addAttribute("caption", "New Item");
         model.addAttribute("item", new Item());
         model.addAttribute("itemTypes", ItemType.values());
         model.addAttribute("itemSubTypes", ItemSubType.values());
@@ -47,6 +48,7 @@ public class ItemController {
 
     @RequestMapping(value = "/edit-item/{id}", method = RequestMethod.GET)
     public String editItem(@PathVariable Integer id, ModelMap model) {
+        model.addAttribute("caption", "Update Item");
         model.addAttribute("item", itemService.findItemById(id));
         model.addAttribute("itemTypes", ItemType.values());
         model.addAttribute("itemSubTypes", ItemSubType.values());
@@ -60,13 +62,6 @@ public class ItemController {
         itemService.createItem(item);
         return "redirect:/list-items";
     }
-    @RequestMapping(value = "/container/{id}/items", method = RequestMethod.GET)
-    public String itemsInContainer(@PathVariable Integer id, ModelMap model) {
-        model.addAttribute("items", itemService.queryItems(String.format("SELECT * FROM item WHERE item.CONTAINER = %d", id)));
-        model.addAttribute("containers", containerService.listContainers());
-        return "list-items";
-    }
-
 
     @RequestMapping(value = "/api/item", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<?> createItem(@RequestBody Item item) {

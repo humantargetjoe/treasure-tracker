@@ -29,7 +29,7 @@ public class Item {
     private Float weight;
 
     @Column(name = "VALUE")
-    private Integer value;
+    private Float value;
 
     @Column(name = "AMOUNT", nullable = false)
     private Integer amount;
@@ -116,11 +116,11 @@ public class Item {
         this.weight = weight;
     }
 
-    public Integer getValue() {
+    public Float getValue() {
         return value;
     }
 
-    public void setValue(Integer value) {
+    public void setValue(Float value) {
         this.value = value;
     }
 

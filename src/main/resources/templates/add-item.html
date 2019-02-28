@@ -7,7 +7,7 @@
 <div class="container">
     <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
 
-    <h2>New Item</h2>
+    <h2 th:inline="text"> [[${caption}]] </h2>
     <div>
         <form class="form-horizontal" th:object="${item}" th:action="@{/item/create}" method="post">
             <input type="hidden" th:field="*{id}"/>
