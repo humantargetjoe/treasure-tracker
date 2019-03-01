@@ -15,12 +15,13 @@
                 <th>Name</th>
                 <th>Maximum Weight</th>
                 <th>Maximum Volume</th>
-                <th>Extradimensional</th>
+                <th>Current Weight</th>
                 <th>Width</th>
                 <th>Height</th>
                 <th>Length</th>
                 <th>Weight</th>
                 <th>Description</th>
+                <th>Extradimensional</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -30,12 +31,13 @@
                 <td th:text="${container.name}"></td>
                 <td th:text="${container.maximumWeight}"></td>
                 <td th:text="${container.maximumVolume}"></td>
-                <td th:text="${container.isExtraDimensional}"></td>
+                <td th:text="${container.currentWeight}"></td>
                 <td th:text="${container.width}"></td>
                 <td th:text="${container.height}"></td>
                 <td th:text="${container.length}"></td>
                 <td th:text="${container.weight}"></td>
                 <td th:text="${container.description}"></td>
+                <td th:text="${container.items}"></td>
                 <td><a th:href="${'/query/container/' + container.id + '/items/'}">items</a></td>
                 <td><a th:href="${'/edit-container/' + container.id}">edit</a></td>
             </tr>

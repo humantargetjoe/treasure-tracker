@@ -1,5 +1,7 @@
 package com.marion.treasuretracker.controller;
 
+import com.marion.treasuretracker.model.ItemSubType;
+import com.marion.treasuretracker.model.Totals;
 import com.marion.treasuretracker.model.TreasureQuery;
 import com.marion.treasuretracker.service.ContainerService;
 import com.marion.treasuretracker.service.ItemService;
@@ -42,5 +44,11 @@ public class QueryController {
         model.addAttribute("items", queryService.queryItemsInContainer(id));
         model.addAttribute("containers", containerService.listContainers());
         return "list-items";
+    }
+
+    @RequestMapping(value = "/query/totals", method = RequestMethod.GET)
+    public String itemsInContainer(ModelMap model) {
+        model.addAttribute("totals", itemService.collectTotals());
+        return "totals";
     }
 }
