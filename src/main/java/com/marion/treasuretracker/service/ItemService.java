@@ -57,7 +57,7 @@ public class ItemService {
         }
 
         validateAndSave(item);
-        changeLogService.recordAcquiredItem("Acquisition Description", item);
+        changeLogService.recordAcquiredItem(item);
 
         return item;
     }
@@ -150,40 +150,31 @@ public class ItemService {
         totals.getCoins().setGold(totalCoinAmount(ItemSubType.gold));
         totals.getCoins().setPlatinum(totalCoinAmount(ItemSubType.platinum));
 
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.agate));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.amber));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.amethyst));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.azurite));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.bandedAgate));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.bloodstone));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.carnelians));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.chrysoberyl));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.coral));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.diamond));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.garnet));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.hematite));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.jade));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.jasper));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.jet));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.moonstone));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.onyx));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.pearl));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.quartz));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.sapphire));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.tigerseye));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.tourmaline));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.turquoise));
-        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.zircon));
+        for(ItemSubType subType: Constants.GEMS) {
+            totalAmountAndValue(totals.addGem(subType), ItemType.gem, subType);
+        }
+
+        for(ItemSubType subType: Constants.JEWELRY) {
+            totalAmountAndValue(totals.addGem(subType), ItemType.jewelry, subType);
+        }
+
         return totals;
     }
 
-    private int totalAmount(ItemType itemType, ItemSubType itemSubType) {
+    private void totalAmountAndValue(Totals.Valuable valuable, ItemType itemType, ItemSubType itemSubType) {
         int total = 0;
+        Float value = 0f;
         List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE, itemType, itemSubType));
         for (Item item : items) {
             total += item.getAmount();
+            value += item.getValue();
+            for (int i = 0; i < item.getAmount(); ++i) {
+                valuable.getDenominations().add(item.getValue());
+            }
         }
-        return total;
+
+        valuable.setCount(total);
+        valuable.setValue(value);
     }
 
     public int totalCoinAmount(ItemSubType itemSubType) {
