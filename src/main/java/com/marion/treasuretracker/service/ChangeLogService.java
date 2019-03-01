@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class ChangeLogService {
         List<ChangeLog> entries = nativeQuery.getResultList();
 
         try {
-            for (ChangeLog entry : entries) {
+            for (ChangeLog entry  :entries) {
                 log.info(objectMapper.writeValueAsString(entry));
             }
         } catch (JsonProcessingException jpEx) {
@@ -61,13 +62,17 @@ public class ChangeLogService {
     }
 
     void recordUpdateItem(Item current, Item updated) {
-        ChangeLog changeLog = new ChangeLog();
-        changeLog.setTimestamp(new Date());
-        changeLog.setReason(ReasonType.UPDATED);
-        changeLog.setDescription(createUpdateDescription(current, updated));
-        changeLog.setItem(updated);
+        List<String> changes = createUpdateDescriptions(current, updated);
+        for (String description  : changes) {
+            ChangeLog changeLog = new ChangeLog();
+            changeLog.setTimestamp(new Date());
+            changeLog.setReason(ReasonType.UPDATED);
+            changeLog.setDescription(description);
+            changeLog.setItem(updated);
+            changeLog.setContainer(updated.getContainer());
 
-        changeLogRepository.save(changeLog);
+            changeLogRepository.save(changeLog);
+        }
     }
 
     void recordAcquiredContainer(String description, Container container) {
@@ -81,13 +86,16 @@ public class ChangeLogService {
     }
 
     void recordUpdateContainer(Container current, Container updated) {
-        ChangeLog changeLog = new ChangeLog();
-        changeLog.setTimestamp(new Date());
-        changeLog.setReason(ReasonType.UPDATED);
-        changeLog.setDescription(createUpdateDescription(current, updated));
-        changeLog.setContainer(updated);
+        List<String> changes = createUpdateDescriptions(current, updated);
+        for (String description  : changes) {
+            ChangeLog changeLog = new ChangeLog();
+            changeLog.setTimestamp(new Date());
+            changeLog.setReason(ReasonType.UPDATED);
+            changeLog.setDescription(description);
+            changeLog.setContainer(updated);
 
-        changeLogRepository.save(changeLog);
+            changeLogRepository.save(changeLog);
+        }
     }
 
     void recordMoveItemContainer(String description, Item item) {
@@ -109,44 +117,44 @@ public class ChangeLogService {
     }
 
 
-    private static String createUpdateDescription(Item current, Item updated) {
-        StringBuilder result = new StringBuilder();
+    private static List<String> createUpdateDescriptions(Item current, Item updated) {
+        List<String> result = new ArrayList<>();
         if (!StringUtils.equals(current.getName(), updated.getName())) {
-            result.append(String.format("name:  '%s' -> '%s'; ", current.getName(), updated.getName()));
+            result.add(String.format("name from '%s' to '%s'; ", current.getName(), updated.getName()));
         }
         if (!StringUtils.equals(current.getDescription(), updated.getDescription())) {
-            result.append(String.format("description:  '%s' -> '%s'; ", current.getDescription(), updated.getDescription()));
+            result.add(String.format("description from '%s' to '%s'; ", current.getDescription(), updated.getDescription()));
         }
         if (!StringUtils.equals(current.getSource(), updated.getSource())) {
-            result.append(String.format("source:  '%s' -> '%s'; ", current.getSource(), updated.getSource()));
+            result.add(String.format("source from '%s' to '%s'; ", current.getSource(), updated.getSource()));
         }
         if (!current.getAmount().equals(updated.getAmount())) {
-            result.append(String.format("amount:  '%s' -> '%s'; ", current.getAmount(), updated.getAmount()));
+            result.add(String.format("amount from '%s' to '%s'; ", current.getAmount(), updated.getAmount()));
         }
 
         if (!current.getItemType().equals(updated.getItemType())) {
-            result.append(String.format("type:  '%s' -> '%s'; ", current.getItemType(), updated.getItemType()));
+            result.add(String.format("type from '%s' to '%s'; ", current.getItemType(), updated.getItemType()));
         }
         if (!current.getItemSubType().equals(updated.getItemSubType())) {
-            result.append(String.format("subtype:  '%s' -> '%s'; ", current.getItemSubType(), updated.getItemSubType()));
+            result.add(String.format("subtype from '%s' to '%s'; ", current.getItemSubType(), updated.getItemSubType()));
         }
 
         if (current.getContainer() != updated.getContainer()) {
-            result.append(createMoveDescription(current, updated));
+            result.add(createMoveDescription(current, updated));
         }
 
-        return result.toString();
+        return result;
     }
 
-    private static String createUpdateDescription(Container current, Container updated) {
-        StringBuilder result = new StringBuilder();
+    private static List<String> createUpdateDescriptions(Container current, Container updated) {
+        List<String> result = new ArrayList<>();
         if (!StringUtils.equals(current.getName(), updated.getName())) {
-            result.append(String.format("'%s' to '%s'; ", current.getName(), updated.getName()));
+            result.add(String.format("'%s' to '%s'; ", current.getName(), updated.getName()));
         }
         if (!StringUtils.equals(current.getDescription(), updated.getDescription())) {
-            result.append(String.format("'%s'' to '%s'; ", current.getDescription(), updated.getDescription()));
+            result.add(String.format("'%s'' to '%s'; ", current.getDescription(), updated.getDescription()));
         }
 
-        return result.toString();
+        return result;
     }
 }

@@ -67,10 +67,10 @@ public class ItemService {
             throw new InvalidItemException("Item does not exist.");
         }
 
-        Item previous = findItemById(item.getId());
-        changeLogService.recordUpdateItem(previous, item);
+        Item previous = findItemById(item.getId()).copy();
 
         validateAndSave(item);
+        changeLogService.recordUpdateItem(previous, item);
 
         return item;
     }
@@ -141,7 +141,61 @@ public class ItemService {
         return queryItems(query);
     }
 
-    public float totalCoinValue() {
+    public Totals collectTotals() {
+        Totals totals = new Totals();
+        totals.getCoins().setTotal(totalCoinValueInGold());
+        totals.getCoins().setCopper(totalCoinAmount(ItemSubType.copper));
+        totals.getCoins().setSilver(totalCoinAmount(ItemSubType.silver));
+        totals.getCoins().setElectrum(totalCoinAmount(ItemSubType.electrum));
+        totals.getCoins().setGold(totalCoinAmount(ItemSubType.gold));
+        totals.getCoins().setPlatinum(totalCoinAmount(ItemSubType.platinum));
+
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.agate));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.amber));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.amethyst));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.azurite));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.bandedAgate));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.bloodstone));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.carnelians));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.chrysoberyl));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.coral));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.diamond));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.garnet));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.hematite));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.jade));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.jasper));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.jet));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.moonstone));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.onyx));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.pearl));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.quartz));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.sapphire));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.tigerseye));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.tourmaline));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.turquoise));
+        totals.getGems().getAgate().setCount(totalAmount(ItemType.gem, ItemSubType.zircon));
+        return totals;
+    }
+
+    private int totalAmount(ItemType itemType, ItemSubType itemSubType) {
+        int total = 0;
+        List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE, itemType, itemSubType));
+        for (Item item : items) {
+            total += item.getAmount();
+        }
+        return total;
+    }
+
+    public int totalCoinAmount(ItemSubType itemSubType) {
+        int total = 0;
+        List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE, ItemType.coin, itemSubType));
+        for (Item item : items) {
+            total += item.getAmount();
+        }
+        return total;
+    }
+
+    public float totalCoinValueInGold() {
         List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE, ItemType.coin));
 
         float value = 0.0f;

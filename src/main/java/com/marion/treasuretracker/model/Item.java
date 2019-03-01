@@ -60,6 +60,23 @@ public class Item {
         return false;
     }
 
+    public Item copy() {
+        Item item = new Item();
+        item.name = this.name;
+        item.description = this.description;
+        item.source = this.source;
+        item.itemType = this.itemType;
+        item.itemSubType = this.itemSubType;
+        item.weight = this.weight;
+        item.value = this.value;
+        item.amount = this.amount;
+        item.height = this.height;
+        item.width = this.width;
+        item.length = this.length;
+        item.container = this.container;
+        return item;
+    }
+
     public Integer getId() {
         return id;
     }
