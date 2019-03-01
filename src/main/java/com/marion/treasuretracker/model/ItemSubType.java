@@ -2,6 +2,7 @@ package com.marion.treasuretracker.model;
 
 public enum ItemSubType {
     none,
+    unspecified,
 
     // Coin subtypes
     platinum,

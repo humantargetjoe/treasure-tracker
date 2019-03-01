@@ -155,7 +155,7 @@ public class ItemService {
         }
 
         for(ItemSubType subType: Constants.JEWELRY) {
-            totalAmountAndValue(totals.addGem(subType), ItemType.jewelry, subType);
+            totalAmountAndValue(totals.addJewelry(subType), ItemType.jewelry, subType);
         }
 
         return totals;

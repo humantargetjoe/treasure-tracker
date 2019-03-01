@@ -16,6 +16,7 @@ public class Constants {
     };
 
     public static ItemSubType[] GEMS = {
+            ItemSubType.unspecified,
             ItemSubType.agate,
             ItemSubType.amber,
             ItemSubType.amethyst,
@@ -43,6 +44,7 @@ public class Constants {
     };
 
     public static ItemSubType[] JEWELRY = {
+            ItemSubType.unspecified,
             ItemSubType.amulet,
             ItemSubType.armlet,
             ItemSubType.beltbuckle,
