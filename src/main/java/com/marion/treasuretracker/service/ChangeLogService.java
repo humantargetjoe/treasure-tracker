@@ -112,7 +112,7 @@ public class ChangeLogService {
     private static String createAcquisitionDescription(Item item) {
         return String.format("Acquired '%s' from '%s'",
                 item.getName(),
-                StringUtils.isBlank(item.getSource()) ? item.getSource() : "unspecified");
+                StringUtils.isNotBlank(item.getSource()) ? item.getSource() : "unspecified");
     }
 
     private static String createAcquisitionDescription(Container item) {

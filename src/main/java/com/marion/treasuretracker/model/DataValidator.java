@@ -61,7 +61,8 @@ public class DataValidator {
         return
                 validateItem(item) &&
                         item.getItemType() == ItemType.gem && (
-                        item.getItemSubType() == ItemSubType.agate ||
+                        item.getItemSubType() == ItemSubType.unspecified ||
+                                item.getItemSubType() == ItemSubType.agate ||
                                 item.getItemSubType() == ItemSubType.amber ||
                                 item.getItemSubType() == ItemSubType.amethyst ||
                                 item.getItemSubType() == ItemSubType.azurite ||
@@ -97,7 +98,8 @@ public class DataValidator {
         return
                 validateItem(item) &&
                         item.getItemType() == ItemType.jewelry && (
-                        item.getItemSubType() == ItemSubType.amulet ||
+                        item.getItemSubType() == ItemSubType.unspecified ||
+                                item.getItemSubType() == ItemSubType.amulet ||
                                 item.getItemSubType() == ItemSubType.armlet ||
                                 item.getItemSubType() == ItemSubType.beltbuckle ||
                                 item.getItemSubType() == ItemSubType.bracelet ||
