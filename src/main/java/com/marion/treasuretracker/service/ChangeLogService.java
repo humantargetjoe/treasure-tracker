@@ -36,7 +36,7 @@ public class ChangeLogService {
         List<ChangeLog> entries = nativeQuery.getResultList();
 
         try {
-            for (ChangeLog entry  :entries) {
+            for (ChangeLog entry : entries) {
                 log.info(objectMapper.writeValueAsString(entry));
             }
         } catch (JsonProcessingException jpEx) {
@@ -51,11 +51,11 @@ public class ChangeLogService {
         return queryChangeLog(query);
     }
 
-    void recordAcquiredItem(String description, Item item) {
+    void recordAcquiredItem(Item item) {
         ChangeLog changeLog = new ChangeLog();
         changeLog.setTimestamp(new Date());
         changeLog.setReason(ReasonType.ACQUIRED);
-        changeLog.setDescription(description);
+        changeLog.setDescription(createAcquisitionDescription(item));
         changeLog.setItem(item);
 
         changeLogRepository.save(changeLog);
@@ -63,7 +63,7 @@ public class ChangeLogService {
 
     void recordUpdateItem(Item current, Item updated) {
         List<String> changes = createUpdateDescriptions(current, updated);
-        for (String description  : changes) {
+        for (String description : changes) {
             ChangeLog changeLog = new ChangeLog();
             changeLog.setTimestamp(new Date());
             changeLog.setReason(ReasonType.UPDATED);
@@ -75,11 +75,11 @@ public class ChangeLogService {
         }
     }
 
-    void recordAcquiredContainer(String description, Container container) {
+    void recordAcquiredContainer(Container container) {
         ChangeLog changeLog = new ChangeLog();
         changeLog.setTimestamp(new Date());
         changeLog.setReason(ReasonType.ACQUIRED);
-        changeLog.setDescription(description);
+        changeLog.setDescription(createAcquisitionDescription(container));
         changeLog.setContainer(container);
 
         changeLogRepository.save(changeLog);
@@ -87,7 +87,7 @@ public class ChangeLogService {
 
     void recordUpdateContainer(Container current, Container updated) {
         List<String> changes = createUpdateDescriptions(current, updated);
-        for (String description  : changes) {
+        for (String description : changes) {
             ChangeLog changeLog = new ChangeLog();
             changeLog.setTimestamp(new Date());
             changeLog.setReason(ReasonType.UPDATED);
@@ -109,13 +109,23 @@ public class ChangeLogService {
         changeLogRepository.save(changeLog);
     }
 
+    private static String createAcquisitionDescription(Item item) {
+        return String.format("Acquired '%s' from '%s'",
+                item.getName(),
+                StringUtils.isBlank(item.getSource()) ? item.getSource() : "unspecified");
+    }
+
+    private static String createAcquisitionDescription(Container item) {
+        return String.format("Acquired '%s'",
+                item.getName());
+    }
+
     private static String createMoveDescription(Item current, Item updated) {
         return String.format("Moved '%s' from '%s' to '%s'",
                 current.getName(),
                 current.getContainer() != null ? current.getContainer().getName() : "none",
                 updated.getContainer() != null ? updated.getContainer().getName() : "none");
     }
-
 
     private static List<String> createUpdateDescriptions(Item current, Item updated) {
         List<String> result = new ArrayList<>();

@@ -43,7 +43,7 @@ public class ContainerService {
         }
 
         containerRepository.save(container);
-        changeLogService.recordAcquiredContainer("created", container);
+        changeLogService.recordAcquiredContainer(container);
 
         return container;
     }

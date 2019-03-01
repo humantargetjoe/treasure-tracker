@@ -37,90 +37,46 @@
             <caption>Gem Totals</caption>
             <thead>
             <tr>
-                <th></th>
-                <th>Totals</th>
-                <th>Agate</th>
-                <th>Amber</th>
-                <th>Amethyst</th>
-                <th>Azurite</th>
-                <th>BandedAgate</th>
-                <th>Bloodstone</th>
-                <th>Carnelians</th>
-                <th>Chrysoberyl</th>
-                <th>Coral</th>
-                <th>Diamond</th>
-                <th>Hematite</th>
-                <th>Jade</th>
-                <th>Jasper</th>
-                <th>Jet</th>
-                <th>Moonstone</th>
-                <th>Onyx</th>
-                <th>Pearl</th>
-                <th>Quartz</th>
-                <th>Tigerseye</th>
-                <th>Tourmaline</th>
-                <th>Turquoise</th>
-                <th>Zircon</th>
+                <th>Name</th>
+                <th>Total Value</th>
+                <th>Total Items</th>
+                <th>Denominations</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>Count</td>
-                <td th:text="${totals.gems.total.count}"></td>
-                <td th:text="${totals.gems.agate.count}"></td>
-                <td th:text="${totals.gems.amber.count}"></td>
-                <td th:text="${totals.gems.amethyst.count}"></td>
-                <td th:text="${totals.gems.azurite.count}"></td>
-                <td th:text="${totals.gems.bandedAgate.count}"></td>
-                <td th:text="${totals.gems.bloodstone.count}"></td>
-                <td th:text="${totals.gems.carnelians.count}"></td>
-                <td th:text="${totals.gems.chrysoberyl.count}"></td>
-                <td th:text="${totals.gems.coral.count}"></td>
-                <td th:text="${totals.gems.diamond.count}"></td>
-                <td th:text="${totals.gems.hematite.count}"></td>
-                <td th:text="${totals.gems.jade.count}"></td>
-                <td th:text="${totals.gems.jasper.count}"></td>
-                <td th:text="${totals.gems.jet.count}"></td>
-                <td th:text="${totals.gems.moonstone.count}"></td>
-                <td th:text="${totals.gems.onyx.count}"></td>
-                <td th:text="${totals.gems.pearl.count}"></td>
-                <td th:text="${totals.gems.quartz.count}"></td>
-                <td th:text="${totals.gems.tigerseye.count}"></td>
-                <td th:text="${totals.gems.tourmaline.count}"></td>
-                <td th:text="${totals.gems.turquoise.count}"></td>
-                <td th:text="${totals.gems.zircon.count}"></td>
-            </tr>
-            <tr>
-                <td>Value</td>
-                <td th:text="${totals.gems.total.count}"></td>
-                <td th:text="${totals.gems.agate.count}"></td>
-                <td th:text="${totals.gems.amber.count}"></td>
-                <td th:text="${totals.gems.amethyst.count}"></td>
-                <td th:text="${totals.gems.azurite.count}"></td>
-                <td th:text="${totals.gems.bandedAgate.count}"></td>
-                <td th:text="${totals.gems.bloodstone.count}"></td>
-                <td th:text="${totals.gems.carnelians.count}"></td>
-                <td th:text="${totals.gems.chrysoberyl.count}"></td>
-                <td th:text="${totals.gems.coral.count}"></td>
-                <td th:text="${totals.gems.diamond.count}"></td>
-                <td th:text="${totals.gems.hematite.count}"></td>
-                <td th:text="${totals.gems.jade.count}"></td>
-                <td th:text="${totals.gems.jasper.count}"></td>
-                <td th:text="${totals.gems.jet.count}"></td>
-                <td th:text="${totals.gems.moonstone.count}"></td>
-                <td th:text="${totals.gems.onyx.count}"></td>
-                <td th:text="${totals.gems.pearl.count}"></td>
-                <td th:text="${totals.gems.quartz.count}"></td>
-                <td th:text="${totals.gems.tigerseye.count}"></td>
-                <td th:text="${totals.gems.tourmaline.count}"></td>
-                <td th:text="${totals.gems.turquoise.count}"></td>
-                <td th:text="${totals.gems.zircon.count}"></td>
+            <tr th:each="item : ${totals.gems}">
+                <td th:text="${item.name}"></td>
+                <td th:text="${item.value}"></td>
+                <td th:text="${item.count}"></td>
+                <td th:text="${item.denominations}"></td>
             </tr>
             </tbody>
         </table>
     </div>
-</
-</v>
+
+
+    <div>
+        <table class="table table-striped">
+            <caption>Jewelry Totals</caption>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Total Value</th>
+                <th>Total Items</th>
+                <th>Denominations</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${totals.jewelry}">
+                <td th:text="${item.name}"></td>
+                <td th:text="${item.value}"></td>
+                <td th:text="${item.count}"></td>
+                <td th:text="${item.denominations}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 </body>
 </html>
