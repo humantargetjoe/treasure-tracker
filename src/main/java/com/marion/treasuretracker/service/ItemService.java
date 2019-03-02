@@ -150,14 +150,29 @@ public class ItemService {
         totals.getCoins().setGold(totalCoinAmount(ItemSubType.gold));
         totals.getCoins().setPlatinum(totalCoinAmount(ItemSubType.platinum));
 
-        for(ItemSubType subType: Constants.GEMS) {
-            totalAmountAndValue(totals.addGem(subType), ItemType.gem, subType);
+        Totals.Valuable gemTotal = totals.addTotal(ItemType.gem);
+        Totals.Valuable jewelryTotal = totals.addTotal(ItemType.jewelry);
+        Totals.Valuable otherTotal = totals.addTotal(ItemType.other);
+        for (ItemSubType subType : Constants.GEMS) {
+            Totals.Valuable valuable = totals.addGem(subType);
+            totalAmountAndValue(valuable, ItemType.gem, subType);
+            gemTotal.setCount(gemTotal.getCount() + valuable.getCount());
+            gemTotal.setValue(gemTotal.getValue() + valuable.getValue());
         }
 
-        for(ItemSubType subType: Constants.JEWELRY) {
-            totalAmountAndValue(totals.addJewelry(subType), ItemType.jewelry, subType);
+        for (ItemSubType subType : Constants.JEWELRY) {
+            Totals.Valuable valuable = totals.addJewelry(subType);
+            totalAmountAndValue(valuable, ItemType.jewelry, subType);
+            jewelryTotal.setCount(jewelryTotal.getCount() + valuable.getCount());
+            jewelryTotal.setValue(jewelryTotal.getValue() + valuable.getValue());
         }
 
+        for (ItemSubType subType : Constants.OTHER) {
+            Totals.Valuable valuable = totals.addOther(subType);
+            totalAmountAndValue(valuable, ItemType.other, subType);
+            otherTotal.setCount(otherTotal.getCount() + valuable.getCount());
+            otherTotal.setValue(otherTotal.getValue() + valuable.getValue());
+        }
         return totals;
     }
 
@@ -166,10 +181,13 @@ public class ItemService {
         Float value = 0f;
         List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE, itemType, itemSubType));
         for (Item item : items) {
-            total += item.getAmount();
-            value += item.getValue();
-            for (int i = 0; i < item.getAmount(); ++i) {
-                valuable.getDenominations().add(item.getValue());
+            // Magic rings, etc., shouldn't show up here despite being jewelry
+            if (item.getValue() != null) {
+                total += item.getAmount();
+                value += item.getAmount() * item.getValue();
+                for (int i = 0; i < item.getAmount(); ++i) {
+                    valuable.getDenominations().add(item.getValue());
+                }
             }
         }
 

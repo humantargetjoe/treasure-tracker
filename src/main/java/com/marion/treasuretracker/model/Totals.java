@@ -18,6 +18,30 @@ public class Totals {
         return jewelry;
     }
 
+    public Valuable addOther(ItemSubType itemSubType) {
+        Valuable other = new Valuable();
+        getOther().add(other);
+        other.name = itemSubType.name();
+        return other;
+    }
+
+    public Valuable addTotal(ItemType itemType) {
+        Valuable total = new Valuable();
+        switch (itemType) {
+            case gem:
+                getGems().add(total);
+                break;
+            case jewelry:
+                getJewelry().add(total);
+                break;
+            default:
+                getOther().add(total);
+                break;
+        }
+        total.name = "Total";
+        return total;
+    }
+
     public Coins getCoins() {
         return coins;
     }
@@ -40,6 +64,14 @@ public class Totals {
 
     public void setGems(List<Valuable> gems) {
         this.gems = gems;
+    }
+
+    public List<Valuable> getOther() {
+        return other;
+    }
+
+    public void setOther(List<Valuable> other) {
+        this.other = other;
     }
 
     public class Valuable {
@@ -141,5 +173,6 @@ public class Totals {
     private Coins coins = new Coins();
     private List<Valuable> jewelry = new ArrayList<>();
     private List<Valuable> gems = new ArrayList<>();
+    private List<Valuable> other = new ArrayList<>();
 
 }
