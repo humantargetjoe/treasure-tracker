@@ -76,6 +76,29 @@
             </tbody>
         </table>
     </div>
+
+    <div>
+        <table class="table table-striped">
+            <caption>Other Valuables Totals</caption>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Total Value</th>
+                <th>Total Items</th>
+                <th>Denominations</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${totals.other}">
+                <td th:text="${item.name}"></td>
+                <td th:text="${item.value}"></td>
+                <td th:text="${item.count}"></td>
+                <td th:text="${item.denominations}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 </body>

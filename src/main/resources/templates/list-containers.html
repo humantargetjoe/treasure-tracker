@@ -37,15 +37,15 @@
                 <td th:text="${container.length}"></td>
                 <td th:text="${container.weight}"></td>
                 <td th:text="${container.description}"></td>
-                <td th:text="${container.items}"></td>
+                <td th:text="${container.isExtraDimensional}"></td>
                 <td><a th:href="${'/query/container/' + container.id + '/items/'}">items</a></td>
                 <td><a th:href="${'/edit-container/' + container.id}">edit</a></td>
             </tr>
             </tbody>
         </table>
-        <div>
-            <a class="button" href="/add-container">Add a Container</a>
-        </div>
+    </div>
+    <div>
+        <a class="button" href="/add-container">Add a Container</a>
     </div>
 </div>
 

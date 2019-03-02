@@ -8,5 +8,9 @@ public enum ItemType {
     armor,
     potion,
     scroll,
+    wand,
+    staff,
+    rod,
+    wondrous,
     other,
 }

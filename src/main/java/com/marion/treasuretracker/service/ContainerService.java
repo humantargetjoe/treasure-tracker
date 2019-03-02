@@ -38,26 +38,29 @@ public class ContainerService {
     ObjectMapper objectMapper = new ObjectMapper();
 
     public Container createContainer(Container container) throws InvalidContainerException {
-        if (!DataValidator.validateContainer(container)) {
-            throw new InvalidContainerException();
+        if (container.getId() != null) {
+            return updateContainer(container);
         }
 
-        containerRepository.save(container);
+        validateAndSave(container);
         changeLogService.recordAcquiredContainer(container);
-
         return container;
     }
 
     public Container updateContainer(Container container) throws InvalidContainerException {
+        Container previous = findContainerById(container.getId());
+        validateAndSave(container);
+        changeLogService.recordUpdateContainer(previous, container);
+
+        return container;
+    }
+
+    private void validateAndSave(Container container) throws InvalidContainerException {
         if (!DataValidator.validateContainer(container)) {
             throw new InvalidContainerException();
         }
 
-        Container previous = findContainerById(container.getId());
         containerRepository.save(container);
-        changeLogService.recordUpdateContainer(previous, container);
-
-        return container;
     }
 
     public Container findContainerById(String id) {

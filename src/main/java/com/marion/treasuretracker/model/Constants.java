@@ -56,4 +56,10 @@ public class Constants {
             ItemSubType.pin,
             ItemSubType.ring,
     };
+
+    public static ItemSubType[] OTHER = {
+            ItemSubType.unspecified,
+            ItemSubType.none,
+            ItemSubType.gold
+    };
 }
