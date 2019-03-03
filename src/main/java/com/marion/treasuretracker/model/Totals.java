@@ -74,6 +74,14 @@ public class Totals {
         this.other = other;
     }
 
+    public Float getGrandTotal() {
+        return grandTotal;
+    }
+
+    public void setGrandTotal(Float grandTotal) {
+        this.grandTotal = grandTotal;
+    }
+
     public class Valuable {
         private String name;
         private Float value = 0f;
@@ -170,6 +178,7 @@ public class Totals {
         }
     }
 
+    private Float grandTotal;
     private Coins coins = new Coins();
     private List<Valuable> jewelry = new ArrayList<>();
     private List<Valuable> gems = new ArrayList<>();
