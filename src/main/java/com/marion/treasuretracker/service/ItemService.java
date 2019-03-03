@@ -173,6 +173,19 @@ public class ItemService {
             otherTotal.setCount(otherTotal.getCount() + valuable.getCount());
             otherTotal.setValue(otherTotal.getValue() + valuable.getValue());
         }
+
+        // Add miscellaneous things to totals, like weapons that are more decorative than functional
+        Totals.Valuable valuable = totals.addOther(ItemSubType.none);
+        valuable.setName("Weapons");
+        totalAmountAndValue(valuable, ItemType.weapon, ItemSubType.none);
+        otherTotal.setCount(otherTotal.getCount() + valuable.getCount());
+        otherTotal.setValue(otherTotal.getValue() + valuable.getValue());
+
+        totals.setGrandTotal(
+                totals.getCoins().getTotal() +
+                gemTotal.getValue() +
+                jewelryTotal.getValue() +
+                otherTotal.getValue());
         return totals;
     }
 
