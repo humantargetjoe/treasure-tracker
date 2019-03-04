@@ -148,6 +148,9 @@ public class ChangeLogService {
         if (!current.getItemSubType().equals(updated.getItemSubType())) {
             result.add(String.format("subtype from '%s' to '%s'; ", current.getItemSubType(), updated.getItemSubType()));
         }
+        if (!current.getValue().equals(updated.getValue())) {
+            result.add(String.format("value from '%s' to '%s'; ", current.getValue(), updated.getValue()));
+        }
 
         if (current.getContainer() != updated.getContainer()) {
             result.add(createMoveDescription(current, updated));
