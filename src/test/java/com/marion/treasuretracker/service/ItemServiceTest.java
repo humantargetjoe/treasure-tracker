@@ -69,7 +69,7 @@ public class ItemServiceTest {
 
         log.info(objectMapper.writeValueAsString(item));
 
-        itemService.addCoins(item);
+        itemService.createItem(item);
     }
 
     @Test(expected = InvalidItemException.class)

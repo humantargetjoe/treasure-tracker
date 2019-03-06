@@ -28,6 +28,12 @@ public class ItemService {
     ChangeLogService changeLogService;
 
     @Autowired
+    TagService tagService;
+
+    @Autowired
+    ItemTagService itemTagService;
+
+    @Autowired
     EntityManager entityManager;
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -48,6 +54,11 @@ public class ItemService {
 
             default:
                 addItem(item);
+        }
+
+        for (String tagName: item.getTags()) {
+            Tag tag = tagService.findTagByName(tagName);
+            itemTagService.createItemTag(item, tag);
         }
     }
 
