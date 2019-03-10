@@ -61,6 +61,16 @@ public class ChangeLogService {
         changeLogRepository.save(changeLog);
     }
 
+    void recordSoldItem(Item item, Integer amount, Float value) {
+        ChangeLog changeLog = new ChangeLog();
+        changeLog.setTimestamp(new Date());
+        changeLog.setReason(ReasonType.SOLD);
+        changeLog.setDescription(createSoldDescription(item, amount, value));
+        changeLog.setItem(item);
+
+        changeLogRepository.save(changeLog);
+    }
+
     void recordUpdateItem(Item current, Item updated) {
         List<String> changes = createUpdateDescriptions(current, updated);
         for (String description : changes) {
@@ -169,5 +179,9 @@ public class ChangeLogService {
         }
 
         return result;
+    }
+
+    private static String createSoldDescription(Item item, Integer amount, Float value){
+        return String.format("Sold %d of '%s' for %s gp", amount, item.getName(), value);
     }
 }

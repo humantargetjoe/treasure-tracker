@@ -46,6 +46,13 @@ public class ItemController {
         return "add-item";
     }
 
+    @RequestMapping(value = "/view-item/{id}", method = RequestMethod.GET)
+    public String viewItem(@PathVariable(name = "id") String id, ModelMap model) {
+        model.addAttribute("caption", "View Item");
+        model.addAttribute("item", itemService.findItemById(id));
+        return "view-item";
+    }
+
     @RequestMapping(value = "/edit-item/{id}", method = RequestMethod.GET)
     public String editItem(@PathVariable Integer id, ModelMap model) {
         model.addAttribute("caption", "Update Item");
@@ -57,14 +64,21 @@ public class ItemController {
     }
 
     @RequestMapping(value = "item/create", method = RequestMethod.POST)
-    public String saveProduct(Item item) throws Exception {
+    public String createItem(Item item) throws Exception {
         log.info(objectMapper.writeValueAsString(item));
         itemService.createItem(item);
         return "redirect:/list-items";
     }
 
+    @RequestMapping(value = "item/sell", method = RequestMethod.POST)
+    public String sellItem(Item item) throws Exception {
+        log.info(objectMapper.writeValueAsString(item));
+        itemService.sellItem(item);
+        return "redirect:/list-items";
+    }
+
     @RequestMapping(value = "/api/item", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<?> createItem(@RequestBody Item item) {
+    public ResponseEntity<?> createItemApi(@RequestBody Item item) {
         Item result;
         try {
             result = itemService.createItem(item);

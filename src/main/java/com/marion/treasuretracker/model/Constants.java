@@ -36,6 +36,7 @@ public class Constants {
             ItemSubType.onyx,
             ItemSubType.pearl,
             ItemSubType.quartz,
+            ItemSubType.ruby,
             ItemSubType.sapphire,
             ItemSubType.tigerseye,
             ItemSubType.tourmaline,

@@ -4,4 +4,5 @@ public enum ReasonType {
     ACQUIRED,
     UPDATED,
     MOVED,
+    SOLD,
 }

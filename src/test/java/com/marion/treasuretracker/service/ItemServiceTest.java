@@ -2,6 +2,7 @@ package com.marion.treasuretracker.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marion.treasuretracker.exceptions.InvalidItemException;
+import com.marion.treasuretracker.model.Container;
 import com.marion.treasuretracker.model.Item;
 import com.marion.treasuretracker.model.ItemSubType;
 import com.marion.treasuretracker.model.ItemType;
@@ -19,6 +20,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -27,6 +30,9 @@ public class ItemServiceTest {
 
     @Autowired
     ItemService itemService;
+
+    @Autowired
+    ContainerService containerService;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -40,6 +46,21 @@ public class ItemServiceTest {
             log.info("Starting test " + description.getMethodName());
         }
     };
+
+    private Container createTestContainer() throws Exception {
+        Container container = new Container();
+        container.setName("Box");
+        container.setDescription("Testing Container.");
+        container.setMaximumVolume(1f);
+        container.setMaximumWeight(1f);
+        container.setIsExtraDimensional(false);
+        container.setWeight(1f);
+        container.setHeight(1f);
+        container.setWidth(1f);
+        container.setLength(1f);
+
+        return containerService.createContainer(container);
+    }
 
     @Test
     public void testCreateItem() throws Exception {
@@ -160,6 +181,30 @@ public class ItemServiceTest {
     @Test
     public void testListItems() throws Exception {
         itemService.listItems();
+    }
+
+
+    @Test
+    public void testSellItem() throws Exception {
+        Container container = createTestContainer();
+
+        Item item = new Item();
+        item.setName("Art");
+        item.setDescription("A beautiful painting");
+        item.setItemType(ItemType.other);
+        item.setItemSubType(ItemSubType.none);
+        item.setAmount(1);
+        item.setValue(100.0f);
+        item.setContainer(container);
+        item = itemService.createItem(item);
+
+        itemService.sellItem(item);
+
+        List<Item> items = itemService.listItems();
+
+        Assert.assertEquals("Incorrect number of items", 2, items.size());
+        Assert.assertEquals("Incorrect amount of items[0]", (int) 0, (int) items.get(0).getAmount());
+        Assert.assertEquals("Incorrect amount of gold from sale", 100, items.get(1).getAmount(), 0.1);
     }
 
     @Test
