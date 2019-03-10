@@ -31,6 +31,7 @@ public enum ItemSubType {
     onyx,
     pearl,
     quartz,
+    ruby,
     sapphire,
     tigerseye,
     tourmaline,

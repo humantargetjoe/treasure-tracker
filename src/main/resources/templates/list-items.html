@@ -25,12 +25,11 @@
                 <th>Source</th>
                 <th>Tags</th>
                 <th>Container</th>
-                <th></th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="item : ${items}">
-                <td th:text="${item.name}"></td>
+                <td><a th:text="${item.name}" th:href="${'/view-item/' + item.id}"></a></td>
                 <td th:text="${item.itemType}"></td>
                 <td th:text="${item.itemSubType}"></td>
                 <td th:text="${item.amount}"></td>
@@ -42,15 +41,14 @@
                 <td th:text="${item.weight}"></td>
                 <td th:text="${item.source}"></td>
                 <td th:text="${item.tags}"></td>
-                <td th:if="${item.container != null}" th:text="${item.container.name}"></td>
+                <td><a th:if="${item.container != null}" th:text="${item.container.name}" th:href="${'/query/container/' + item.container.id} +'/items'"></a></td>
                 <td th:unless="${item.container != null}"></td>
-                <td><a th:href="${'/edit-item/' + item.id}">edit</a></td>
             </tr>
             </tbody>
         </table>
     </div>
     <div>
-        <a class="button" href="/add-item">Add a item</a>
+        <a class="button" href="/add-item">Add an item</a>
     </div>
 </div>
 

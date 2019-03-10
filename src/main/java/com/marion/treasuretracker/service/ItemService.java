@@ -3,6 +3,7 @@ package com.marion.treasuretracker.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marion.treasuretracker.exceptions.InvalidItemException;
+import com.marion.treasuretracker.exceptions.InvalidSaleException;
 import com.marion.treasuretracker.model.*;
 import com.marion.treasuretracker.repository.ItemRepository;
 import org.apache.commons.logging.Log;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,6 +110,58 @@ public class ItemService {
         itemRepository.save(item);
     }
 
+    public void sellItem(Item item) throws InvalidSaleException, InvalidItemException {
+        Integer amount = item.getAmount();
+        item = findItemById(item.getId());
+
+        if (item.getItemType() == ItemType.coin) {
+            throw new InvalidSaleException("Cannot sell coins");
+        }
+
+        if (item.getValue() == null) {
+            throw new InvalidSaleException("Cannot sell item without value.");
+        }
+
+        // Can't sell more than you have
+        if (item.getAmount() < amount) {
+            amount = item.getAmount();
+        }
+
+        Float value = item.getValue() * amount;
+
+        log.debug(String.format("Selling %s for %s gp", item.getName(), value));
+
+        if (value % 10 > 0.5) {
+            log.debug("Need to convert item to silver/copper as well as gold");
+        }
+
+        // Preferentially increment the first gold coins item found in the same container
+        String query = String.format(Queries.GOLD_COINS_IN_CONTAINER, item.getContainer().getId());
+        List<Item> goldCoins = queryItems(query);
+        Item coins = null;
+        if (goldCoins.size() > 0) {
+            coins = goldCoins.get(0);
+            coins.setAmount(coins.getAmount() + value.intValue());
+            addCoins(coins);
+        }
+        else {
+            coins = new Item();
+            coins.setName("Gold Coins");
+            coins.setItemType(ItemType.coin);
+            coins.setItemSubType(ItemSubType.gold);
+            coins.setAmount(value.intValue());
+            coins.setContainer(item.getContainer());
+        }
+        addCoins(coins);
+
+        item.setAmount(item.getAmount() - amount);
+        item.setContainer(null);
+        item.getTags().add("SOLD");
+        itemRepository.save(item);
+
+        changeLogService.recordSoldItem(item, amount, value);
+    }
+
     public Item findItemById(String id) {
         return findItemById(Integer.parseInt(id));
     }
@@ -137,7 +191,7 @@ public class ItemService {
     }
 
     public List<Item> listItems() {
-        String query = "SELECT * FROM item";
+        String query = "SELECT * FROM item WHERE AMOUNT > 0";
         return queryItems(query);
     }
 
@@ -183,9 +237,9 @@ public class ItemService {
 
         totals.setGrandTotal(
                 totals.getCoins().getTotal() +
-                gemTotal.getValue() +
-                jewelryTotal.getValue() +
-                otherTotal.getValue());
+                        gemTotal.getValue() +
+                        jewelryTotal.getValue() +
+                        otherTotal.getValue());
         return totals;
     }
 

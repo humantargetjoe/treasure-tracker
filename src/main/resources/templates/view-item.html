@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+<body>
+
+<div class="container">
+    <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
+
+    <h1 th:inline="text"> [[${caption}]] </h1>
+    <div th:object="${item}">
+        <a th:href="${'/edit-item/' + item.id}">Edit</a>
+    </div>
+    <div>
+        <form class="form-horizontal" th:object="${item}" th:action="@{/item/sell}" method="post">
+            <input type="hidden" th:field="*{id}"/>
+            <input type="hidden" th:field="*{amount}"/>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Name:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.name}"></p></div>
+                <label class="col-sm-2 control-label">Description:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.description}" maxlength="255"></p>
+                </div>
+                <label class="col-sm-2 control-label">Amount:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.amount}"></p>
+                </div>
+                <label class="col-sm-2 control-label">Type:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.itemType}"></p>
+                </div>
+                <label class="col-sm-2 control-label">SubType:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.itemSubType}"></p>
+                </div>
+                <label class="col-sm-2 control-label">Value:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.value}"></p>
+                </div>
+                <label class="col-sm-2 control-label">Weight:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.weight}"></p>
+                </div>
+                <label class="col-sm-2 control-label">Height:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.height}"></p>
+                </div>
+                <label class="col-sm-2 control-label">Width:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.width}"></p>
+                </div>
+                <label class="col-sm-2 control-label">Length:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.length}"></p>
+                </div>
+                <label class="col-sm-2 control-label">Source:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.source}"></p>
+                </div>
+                <label class="col-sm-2 control-label">Tags:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.tags}"></p>
+                </div>
+                <label class="col-sm-2 control-label">Container:</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="${item.container.name}"></p>
+                </div>
+            </div>
+            <div class="row" th:if="${item.itemType != 'coin'}">
+                <button type="submit" class="btn btn-default">Sell</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
