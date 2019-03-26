@@ -71,6 +71,16 @@ public class ChangeLogService {
         changeLogRepository.save(changeLog);
     }
 
+    void recordSpentItem(Item item, Integer amount, String description) {
+        ChangeLog changeLog = new ChangeLog();
+        changeLog.setTimestamp(new Date());
+        changeLog.setReason(ReasonType.SPENT);
+        changeLog.setDescription(createSpentDescription(item, amount, description));
+        changeLog.setItem(item);
+
+        changeLogRepository.save(changeLog);
+    }
+
     void recordUpdateItem(Item current, Item updated) {
         List<String> changes = createUpdateDescriptions(current, updated);
         for (String description : changes) {
@@ -183,5 +193,9 @@ public class ChangeLogService {
 
     private static String createSoldDescription(Item item, Integer amount, Float value){
         return String.format("Sold %d of '%s' for %s gp", amount, item.getName(), value);
+    }
+
+    private static String createSpentDescription(Item item, Integer amount, String description){
+        return String.format("Spent %d %s for %s", amount, item.getItemSubType(), description);
     }
 }

@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.marion.treasuretracker.model.Constants.poundsPerCoin;
 
@@ -162,6 +160,29 @@ public class ItemService {
         changeLogService.recordSoldItem(item, amount, value);
     }
 
+    public void spendCoins(Item item) throws InvalidSaleException, InvalidItemException {
+        int amount = item.getAmount();
+        String description = item.getDescription();
+
+        item = findItemById(item.getId());
+
+        if (item.getItemType() != ItemType.coin) {
+            throw new InvalidSaleException("Can only spend coins.");
+        }
+        if (amount < 0) {
+            throw new InvalidSaleException("Can't spend negative coins");
+        }
+
+        if (amount > item.getAmount()) {
+            amount = item.getAmount();
+        }
+
+        item.setAmount(item.getAmount() - amount);
+        addCoins(item);
+
+        changeLogService.recordSpentItem(item, amount, description);
+    }
+
     public Item findItemById(String id) {
         return findItemById(Integer.parseInt(id));
     }
@@ -243,6 +264,17 @@ public class ItemService {
         return totals;
     }
 
+    public Map<ItemSubType, Item> queryCoinsInContainer(Integer containerId) throws Exception {
+        List<Item> coins = queryItems(String.format(Queries.ITEMS_BY_TYPE_IN_CONTAINER, ItemType.coin, containerId));
+
+        Map<ItemSubType,Item> map = new HashMap<>();
+        for (Item coin: coins) {
+            map.put(coin.getItemSubType(), coin);
+        }
+
+        return map;
+    }
+
     private void totalAmountAndValue(Totals.Valuable valuable, ItemType itemType, ItemSubType itemSubType) {
         int total = 0;
         Float value = 0f;
@@ -262,7 +294,7 @@ public class ItemService {
         valuable.setValue(value);
     }
 
-    public int totalCoinAmount(ItemSubType itemSubType) {
+    private int totalCoinAmount(ItemSubType itemSubType) {
         int total = 0;
         List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE, ItemType.coin, itemSubType));
         for (Item item : items) {
@@ -271,7 +303,7 @@ public class ItemService {
         return total;
     }
 
-    public float totalCoinValueInGold() {
+    float totalCoinValueInGold() {
         List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE, ItemType.coin));
 
         float value = 0.0f;
