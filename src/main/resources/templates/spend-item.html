@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+<body>
+
+<div class="container">
+    <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
+
+    <h1 th:inline="text"> [[${caption}]] </h1>
+    <div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Coin</th>
+                <th>Amount</th>
+                <th>Spend</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${platinum != null}">
+                <td th:text="${platinum.itemSubType}"></td>
+                <td th:text="${platinum.amount}"></td>
+                <td>
+                    <form class="form-inline" th:object="${platinum}" th:action="@{/item/spend}" method="post">
+                        <input type="hidden" th:field="${platinum.id}"/>
+                        <input type="text" class="form-control" th:field="${platinum.amount}" th:value=""/>
+                        <input type="text" class="form-control" th:field="${platinum.description}" th:value=""/>
+                        <button type="submit" class="btn btn-default">Spend</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${gold != null}">
+                <td th:text="${gold.itemSubType}"></td>
+                <td th:text="${gold.amount}"></td>
+                <td>
+                    <form class="form-inline" th:object="${gold}" th:action="@{/item/spend}" method="post">
+                        <input type="hidden" th:field="${gold.id}"/>
+                        <input type="text" class="form-control" th:field="${gold.amount}" th:value="ex"/>
+                        <input type="text" class="form-control" th:field="${gold.description}" th:value="ex"/>
+                        <button type="submit" class="btn btn-default">Spend</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${electrum != null}">
+                <td th:text="${electrum.itemSubType}"></td>
+                <td th:text="${electrum.amount}"></td>
+                <td>
+                    <form class="form-inline" th:object="${electrum}" th:action="@{/item/spend}" method="post">
+                        <input type="hidden" th:field="${electrum.id}"/>
+                        <input type="text" class="form-control" th:field="${electrum.amount}"/>
+                        <input type="text" class="form-control" th:field="${electrum.description}"/>
+                        <button type="submit" class="btn btn-default">Spend</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${silver != null}">
+                <td th:text="${silver.itemSubType}"></td>
+                <td th:text="${silver.amount}"></td>
+                <td>
+                    <form class="form-inline" th:object="${silver}" th:action="@{/item/spend}" method="post">
+                        <input type="hidden" th:field="${silver.id}"/>
+                        <input type="text" class="form-control" th:field="${silver.amount}"/>
+                        <input type="text" class="form-control" th:field="${silver.description}"/>
+                        <button type="submit" class="btn btn-default">Spend</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${copper != null}">
+                <td th:text="${copper.itemSubType}"></td>
+                <td th:text="${copper.amount}"></td>
+                <td>
+                    <form class="form-inline" th:object="${copper}" th:action="@{/item/spend}" method="post">
+                        <input type="hidden" th:field="${copper.id}"/>
+                        <input type="text" class="form-control" th:field="${copper.amount}"/>
+                        <input type="text" class="form-control" th:field="${copper.description}"/>
+                        <button type="submit" class="btn btn-default">Spend</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -202,9 +202,9 @@ public class ItemServiceTest {
 
         List<Item> items = itemService.listItems();
 
-        Assert.assertEquals("Incorrect number of items", 2, items.size());
-        Assert.assertEquals("Incorrect amount of items[0]", (int) 0, (int) items.get(0).getAmount());
-        Assert.assertEquals("Incorrect amount of gold from sale", 100, items.get(1).getAmount(), 0.1);
+        Assert.assertEquals("Incorrect number of items", 1, items.size());
+//        Assert.assertEquals("Incorrect amount of items[0]", (int) 0, (int) items.get(0).getAmount());
+        Assert.assertEquals("Incorrect amount of gold from sale", 100, items.get(0).getAmount(), 0.1);
     }
 
     @Test
@@ -218,5 +218,27 @@ public class ItemServiceTest {
         float value = itemService.totalCoinValueInGold();
 
         Assert.assertEquals("Total Value in GP incorrect", 5f, value, 0.001);
+    }
+
+    @Test
+    public void spendCoins() throws Exception {
+        Item goldCoins = new Item();
+        goldCoins.setName("Gold Coins");
+        goldCoins.setAmount(100);
+        goldCoins.setItemType(ItemType.coin);
+        goldCoins.setItemSubType(ItemSubType.gold);
+        itemService.addCoins(goldCoins);
+
+        float initialValue = itemService.totalCoinValueInGold();
+
+        Item updatedItem = new Item();
+        updatedItem.setId(goldCoins.getId());
+        updatedItem.setDescription("Living expenses, one week, wealthy");
+        updatedItem.setAmount(10);
+        itemService.spendCoins(updatedItem);
+
+        float updatedValue = itemService.totalCoinValueInGold();
+
+        Assert.assertEquals("Total Value in GP incorrect", 90f, updatedValue, 0.001f);
     }
 }

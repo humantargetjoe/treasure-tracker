@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ItemController {
@@ -74,6 +75,29 @@ public class ItemController {
     public String sellItem(Item item) throws Exception {
         log.info(objectMapper.writeValueAsString(item));
         itemService.sellItem(item);
+        return "redirect:/list-items";
+    }
+
+    @RequestMapping(value = "spend-item/{id}", method = RequestMethod.GET)
+    public String displaySpend(@PathVariable Integer id, ModelMap model) throws Exception {
+        String caption = "Spend Coins from " + containerService.findContainerById(id).getName();
+
+        Map<ItemSubType, Item> coins = itemService.queryCoinsInContainer(id);
+        model.addAttribute("caption", caption);
+        model.addAttribute("coins", coins);
+        model.addAttribute("platinum", coins.get(ItemSubType.platinum));
+        model.addAttribute("gold", coins.get(ItemSubType.gold));
+        model.addAttribute("electrum", coins.get(ItemSubType.electrum));
+        model.addAttribute("silver", coins.get(ItemSubType.silver));
+        model.addAttribute("copper", coins.get(ItemSubType.copper));
+        return "spend-item";
+    }
+
+    @RequestMapping(value = "item/spend", method = RequestMethod.POST)
+    public String spendItems(Item item) throws Exception {
+        log.info("Received update for coins for spending");
+        log.info(objectMapper.writeValueAsString(item));
+        itemService.spendCoins(item);
         return "redirect:/list-items";
     }
 
