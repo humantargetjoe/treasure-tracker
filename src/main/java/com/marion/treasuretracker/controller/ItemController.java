@@ -83,8 +83,10 @@ public class ItemController {
         String caption = "Spend Coins from " + containerService.findContainerById(id).getName();
 
         Map<ItemSubType, Item> coins = itemService.queryCoinsInContainer(id);
+        for (Map.Entry<ItemSubType,Item> entry: coins.entrySet()) {
+            entry.getValue().setDescription("");
+        }
         model.addAttribute("caption", caption);
-        model.addAttribute("coins", coins);
         model.addAttribute("platinum", coins.get(ItemSubType.platinum));
         model.addAttribute("gold", coins.get(ItemSubType.gold));
         model.addAttribute("electrum", coins.get(ItemSubType.electrum));
