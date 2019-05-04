@@ -48,12 +48,17 @@ public class ItemServiceTest {
     };
 
     private Container createTestContainer() throws Exception {
+        return createTestContainer(1);
+    }
+
+    private Container createTestContainer(int i) throws Exception {
         Container container = new Container();
-        container.setName("Box");
-        container.setDescription("Testing Container.");
+        container.setName("Container " + i);
+        container.setDescription("Testing Container #" + i);
         container.setMaximumVolume(1f);
-        container.setMaximumWeight(1f);
+        container.setMaximumWeight(10f);
         container.setIsExtraDimensional(false);
+        container.setCurrentWeight(0f);
         container.setWeight(1f);
         container.setHeight(1f);
         container.setWidth(1f);
@@ -69,6 +74,7 @@ public class ItemServiceTest {
         item.setItemType(ItemType.weapon);
         item.setItemSubType(ItemSubType.none);
         item.setAmount(1);
+        item.setContainer(containerService.createContainer(createTestContainer()));
         Item result = itemService.createItem(item);
 
         Assert.assertEquals("Names don't match", item.getName(), result.getName());
@@ -221,7 +227,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public void spendCoins() throws Exception {
+    public void testSpendCoins() throws Exception {
         Item goldCoins = new Item();
         goldCoins.setName("Gold Coins");
         goldCoins.setAmount(100);
@@ -241,4 +247,82 @@ public class ItemServiceTest {
 
         Assert.assertEquals("Total Value in GP incorrect", 90f, updatedValue, 0.001f);
     }
+
+    @Test
+    public void testMergeCoins() throws Exception {
+        Container container = createTestContainer();
+
+        Item goldCoins = new Item();
+        goldCoins.setName("Gold Coins 1");
+        goldCoins.setAmount(100);
+        goldCoins.setItemType(ItemType.coin);
+        goldCoins.setItemSubType(ItemSubType.gold);
+        goldCoins.setContainer(container);
+        itemService.createItem(goldCoins);
+
+        goldCoins = itemService.findItemById(goldCoins.getId());
+
+        Item moreGoldCoins = new Item();
+        moreGoldCoins.setName("Gold Coins 2");
+        moreGoldCoins.setAmount(15);
+        moreGoldCoins.setItemType(ItemType.coin);
+        moreGoldCoins.setItemSubType(ItemSubType.gold);
+        moreGoldCoins.setContainer(container);
+        itemService.createItem(moreGoldCoins);
+
+        goldCoins = itemService.findItemById(goldCoins.getId());
+        moreGoldCoins = itemService.findItemById(moreGoldCoins.getId());
+
+        Assert.assertEquals(115, (long) goldCoins.getAmount());
+        Assert.assertEquals(0, (long) moreGoldCoins.getAmount());
+    }
+    
+    @Test
+    public void testUpdateContainerWeight_CreateItem() throws Exception {
+        Container container = createTestContainer();
+
+        Item item = new Item();
+        item.setName("Longsword");
+        item.setItemType(ItemType.weapon);
+        item.setItemSubType(ItemSubType.none);
+        item.setAmount(1);
+        item.setWeight(2.0f);
+        item.setContainer(container);
+        Item result = itemService.createItem(item);
+
+        Assert.assertEquals("Names don't match", item.getName(), result.getName());
+        Assert.assertEquals("ID hasn't been updated", item.getId(), result.getId());
+        container = containerService.findContainerById(container.getId());
+        Assert.assertEquals("", 2.0f, container.getCurrentWeight(), 0.001f);
+    }
+
+    @Test
+    public void testUpdateContainerWeight_MoveItem() throws Exception {
+        Container container1 = createTestContainer(1);
+        Container container2 = createTestContainer(2);
+
+        Item item = new Item();
+        item.setName("Longsword");
+        item.setItemType(ItemType.weapon);
+        item.setItemSubType(ItemSubType.none);
+        item.setAmount(1);
+        item.setWeight(2.0f);
+        item.setContainer(container1);
+        Item result = itemService.createItem(item);
+
+        Assert.assertEquals("Names don't match", item.getName(), result.getName());
+        Assert.assertEquals("ID hasn't been updated", item.getId(), result.getId());
+        container1 = containerService.findContainerById(container1.getId());
+        container2 = containerService.findContainerById(container2.getId());
+        Assert.assertEquals("", 2.0f, container1.getCurrentWeight(), 0.001f);
+        Assert.assertEquals("", 0f, container2.getCurrentWeight(), 0.001f);
+
+        result.setContainer(container2);
+        itemService.updateItem(result);
+        container1 = containerService.findContainerById(container1.getId());
+        container2 = containerService.findContainerById(container2.getId());
+        Assert.assertEquals("", 0f, container1.getCurrentWeight(), 0.001f);
+        Assert.assertEquals("", 2.0f, container2.getCurrentWeight(), 0.001f);
+    }
+
 }

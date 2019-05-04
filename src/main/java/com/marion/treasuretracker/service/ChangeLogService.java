@@ -18,6 +18,7 @@ import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ChangeLogService {
@@ -57,6 +58,7 @@ public class ChangeLogService {
         changeLog.setReason(ReasonType.ACQUIRED);
         changeLog.setDescription(createAcquisitionDescription(item));
         changeLog.setItem(item);
+        changeLog.setContainer(item.getContainer());
 
         changeLogRepository.save(changeLog);
     }
@@ -67,6 +69,7 @@ public class ChangeLogService {
         changeLog.setReason(ReasonType.SOLD);
         changeLog.setDescription(createSoldDescription(item, amount, value));
         changeLog.setItem(item);
+        changeLog.setContainer(item.getContainer());
 
         changeLogRepository.save(changeLog);
     }
@@ -77,6 +80,7 @@ public class ChangeLogService {
         changeLog.setReason(ReasonType.SPENT);
         changeLog.setDescription(createSpentDescription(item, amount, description));
         changeLog.setItem(item);
+        changeLog.setContainer(item.getContainer());
 
         changeLogRepository.save(changeLog);
     }
@@ -158,17 +162,17 @@ public class ChangeLogService {
         if (!StringUtils.equals(current.getSource(), updated.getSource())) {
             result.add(String.format("source from '%s' to '%s'; ", current.getSource(), updated.getSource()));
         }
-        if (!current.getAmount().equals(updated.getAmount())) {
+        if (!Objects.equals(current.getAmount(),updated.getAmount())) {
             result.add(String.format("amount from '%s' to '%s'; ", current.getAmount(), updated.getAmount()));
         }
 
-        if (!current.getItemType().equals(updated.getItemType())) {
+        if (!Objects.equals(current.getItemType(),updated.getItemType())) {
             result.add(String.format("type from '%s' to '%s'; ", current.getItemType(), updated.getItemType()));
         }
-        if (!current.getItemSubType().equals(updated.getItemSubType())) {
+        if (!Objects.equals(current.getItemSubType(),updated.getItemSubType())) {
             result.add(String.format("subtype from '%s' to '%s'; ", current.getItemSubType(), updated.getItemSubType()));
         }
-        if (!current.getValue().equals(updated.getValue())) {
+        if (!Objects.equals(current.getValue(), updated.getValue())) {
             result.add(String.format("value from '%s' to '%s'; ", current.getValue(), updated.getValue()));
         }
 
