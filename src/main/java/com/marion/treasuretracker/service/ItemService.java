@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.util.*;
 
 import static com.marion.treasuretracker.model.Constants.poundsPerCoin;
@@ -40,6 +41,7 @@ public class ItemService {
         switch (item.getItemType()) {
             case coin:
                 addCoins(item);
+                mergeCoinsInContainer(item.getItemSubType(), item.getContainer());
                 break;
 
             case gem:
@@ -57,17 +59,20 @@ public class ItemService {
         adjustContainerWeight(item);
     }
 
+    @Transactional
     public Item createItem(Item item) throws InvalidItemException {
         if (item.getId() != null) {
             return updateItem(item);
         }
 
         validateAndSave(item);
+        adjustContainerWeight(item.getContainer());
         changeLogService.recordAcquiredItem(item);
 
         return item;
     }
 
+    @Transactional
     public Item updateItem(Item item) throws InvalidItemException {
         if (item.getId() == null) {
             throw new InvalidItemException("Item does not exist.");
@@ -76,6 +81,8 @@ public class ItemService {
         Item previous = findItemById(item.getId()).copy();
 
         validateAndSave(item);
+        adjustContainerWeight(previous.getContainer());
+        adjustContainerWeight(item.getContainer());
         changeLogService.recordUpdateItem(previous, item);
 
         return item;
@@ -114,6 +121,7 @@ public class ItemService {
         itemRepository.save(item);
     }
 
+    @Transactional
     public void sellItem(Item item) throws InvalidSaleException, InvalidItemException {
         Integer amount = item.getAmount();
         item = findItemById(item.getId());
@@ -147,8 +155,7 @@ public class ItemService {
             coins = goldCoins.get(0);
             coins.setAmount(coins.getAmount() + value.intValue());
             addCoins(coins);
-        }
-        else {
+        } else {
             coins = new Item();
             coins.setName("Gold Coins");
             coins.setItemType(ItemType.coin);
@@ -166,6 +173,7 @@ public class ItemService {
         changeLogService.recordSoldItem(item, amount, value);
     }
 
+    @Transactional
     public void spendCoins(Item item) throws InvalidSaleException, InvalidItemException {
         int amount = item.getAmount();
         String description = item.getDescription();
@@ -205,15 +213,6 @@ public class ItemService {
     public List<Item> queryItems(String query) {
         Query nativeQuery = entityManager.createNativeQuery(query, Item.class);
         List<Item> items = nativeQuery.getResultList();
-
-        try {
-            for (Item item : items) {
-                log.info(objectMapper.writeValueAsString(item));
-            }
-        } catch (JsonProcessingException jpEx) {
-            log.error(jpEx.getMessage(), jpEx);
-        }
-
         return items;
     }
 
@@ -273,12 +272,35 @@ public class ItemService {
     public Map<ItemSubType, Item> queryCoinsInContainer(Integer containerId) throws Exception {
         List<Item> coins = queryItems(String.format(Queries.ITEMS_BY_TYPE_IN_CONTAINER, ItemType.coin, containerId));
 
-        Map<ItemSubType,Item> map = new HashMap<>();
-        for (Item coin: coins) {
+        Map<ItemSubType, Item> map = new HashMap<>();
+        for (Item coin : coins) {
             map.put(coin.getItemSubType(), coin);
         }
 
         return map;
+    }
+
+    void mergeCoinsInContainer(ItemSubType itemSubType, Container container) throws InvalidItemException {
+        List<Item> results = queryItems(String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE_IN_CONTAINER, ItemType.coin, itemSubType, container.getId()));
+
+        if (results.size() <= 1) {
+            return;
+        }
+
+        int amount = 0;
+        for (int i = 1; i < results.size(); ++i) {
+            Item item = results.get(i);
+            amount += item.getAmount();
+
+            item.setAmount(0);
+            item.setWeight(0f);
+            item.setValue(0f);
+            itemRepository.save(item);
+        }
+
+        Item baseCoin = results.get(0);
+        baseCoin.setAmount(baseCoin.getAmount() + amount);
+        addCoins(baseCoin);
     }
 
     private void totalAmountAndValue(Totals.Valuable valuable, ItemType itemType, ItemSubType itemSubType) {
@@ -339,21 +361,29 @@ public class ItemService {
         return amount;
     }
 
-    private void adjustContainerWeight(Item item) {
-        List<Item> items = queryItems(String.format(Queries.ITEMS_IN_CONTAINER, item.getContainer().getId()));
+    private void adjustContainerWeight(Container container) {
+        List<Item> items = queryItems(String.format(Queries.ITEMS_IN_CONTAINER, container.getId()));
         Float weight = 0f;
-        for (Item itemInList: items) {
-            weight += itemInList.getWeight();
+        for (Item itemInList : items) {
+            if (itemInList.getWeight() != null) {
+                weight += itemInList.getWeight();
+            }
             log.debug("Weight: " + weight);
         }
 
-        Container container = item.getContainer();
+        if (container.getMaximumWeight() < weight) {
+            log.error(
+                    String.format("Cannot move item to %s, exceeds maximum weight (%1.01f/%1.01f).",
+                            container.getName(),
+                            weight,
+                            container.getMaximumWeight()));
+        }
+
         container.setCurrentWeight(weight);
         log.debug("Updating " + container.getName() + " to weight " + weight);
         try {
             containerService.updateContainer(container);
-        }
-        catch (InvalidContainerException icEx) {
+        } catch (InvalidContainerException icEx) {
             log.error(icEx.getMessage(), icEx);
         }
     }
