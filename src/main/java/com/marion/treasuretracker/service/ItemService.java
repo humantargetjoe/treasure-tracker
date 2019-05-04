@@ -2,6 +2,7 @@ package com.marion.treasuretracker.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.marion.treasuretracker.exceptions.InvalidContainerException;
 import com.marion.treasuretracker.exceptions.InvalidItemException;
 import com.marion.treasuretracker.exceptions.InvalidSaleException;
 import com.marion.treasuretracker.model.*;
@@ -28,6 +29,9 @@ public class ItemService {
     ChangeLogService changeLogService;
 
     @Autowired
+    ContainerService containerService;
+
+    @Autowired
     EntityManager entityManager;
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -49,6 +53,8 @@ public class ItemService {
             default:
                 addItem(item);
         }
+
+        adjustContainerWeight(item);
     }
 
     public Item createItem(Item item) throws InvalidItemException {
@@ -331,5 +337,24 @@ public class ItemService {
                 return amount * Constants.goldPerCopper;
         }
         return amount;
+    }
+
+    private void adjustContainerWeight(Item item) {
+        List<Item> items = queryItems(String.format(Queries.ITEMS_IN_CONTAINER, item.getContainer().getId()));
+        Float weight = 0f;
+        for (Item itemInList: items) {
+            weight += itemInList.getWeight();
+            log.debug("Weight: " + weight);
+        }
+
+        Container container = item.getContainer();
+        container.setCurrentWeight(weight);
+        log.debug("Updating " + container.getName() + " to weight " + weight);
+        try {
+            containerService.updateContainer(container);
+        }
+        catch (InvalidContainerException icEx) {
+            log.error(icEx.getMessage(), icEx);
+        }
     }
 }
