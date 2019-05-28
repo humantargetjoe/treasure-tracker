@@ -2,10 +2,7 @@ package com.marion.treasuretracker.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marion.treasuretracker.model.ChangeLog;
-import com.marion.treasuretracker.model.Container;
-import com.marion.treasuretracker.model.Item;
-import com.marion.treasuretracker.model.ReasonType;
+import com.marion.treasuretracker.model.*;
 import com.marion.treasuretracker.repository.ChangeLogRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -63,6 +60,28 @@ public class ChangeLogService {
         changeLogRepository.save(changeLog);
     }
 
+    void recordLootedItem(Item item) {
+        ChangeLog changeLog = new ChangeLog();
+        changeLog.setTimestamp(new Date());
+        changeLog.setReason(ReasonType.LOOTED);
+        changeLog.setDescription(createLootedDescription(item));
+        changeLog.setItem(item);
+        changeLog.setContainer(item.getContainer());
+
+        changeLogRepository.save(changeLog);
+    }
+
+    void recordPurchasedItem(Item item, int amount, ItemType itemType, ItemSubType itemSubType) {
+        ChangeLog changeLog = new ChangeLog();
+        changeLog.setTimestamp(new Date());
+        changeLog.setReason(ReasonType.PURCHASED);
+        changeLog.setDescription(createPurchasedDescription(item, amount, itemType, itemSubType));
+        changeLog.setItem(item);
+        changeLog.setContainer(item.getContainer());
+
+        changeLogRepository.save(changeLog);
+    }
+
     void recordSoldItem(Item item, Integer amount, Float value) {
         ChangeLog changeLog = new ChangeLog();
         changeLog.setTimestamp(new Date());
@@ -79,6 +98,17 @@ public class ChangeLogService {
         changeLog.setTimestamp(new Date());
         changeLog.setReason(ReasonType.SPENT);
         changeLog.setDescription(createSpentDescription(item, amount, description));
+        changeLog.setItem(item);
+        changeLog.setContainer(item.getContainer());
+
+        changeLogRepository.save(changeLog);
+    }
+
+    void recordExchangeCoins(Item item, ItemSubType itemSubType, int amount) {
+        ChangeLog changeLog = new ChangeLog();
+        changeLog.setTimestamp(new Date());
+        changeLog.setReason(ReasonType.UPDATED);
+        changeLog.setDescription(createExchangeDescription(amount, itemSubType, item.getAmount(), item.getItemSubType()));
         changeLog.setItem(item);
         changeLog.setContainer(item.getContainer());
 
@@ -137,6 +167,21 @@ public class ChangeLogService {
         return String.format("Acquired '%s' from '%s'",
                 item.getName(),
                 StringUtils.isNotBlank(item.getSource()) ? item.getSource() : "unspecified");
+    }
+
+    private static String createLootedDescription(Item item) {
+        return String.format("Looted '%s' from '%s'",
+                item.getName(),
+                StringUtils.isNotBlank(item.getSource()) ? item.getSource() : "unspecified");
+    }
+
+    private static String createPurchasedDescription(Item item, int amount, ItemType itemType, ItemSubType itemSubType) {
+        return String.format("Purchased '%s' from '%s' for %d %s %s",
+                item.getName(),
+                StringUtils.isNotBlank(item.getSource()) ? item.getSource() : "unspecified",
+                amount,
+                itemType,
+                itemSubType);
     }
 
     private static String createAcquisitionDescription(Container item) {
@@ -201,5 +246,9 @@ public class ChangeLogService {
 
     private static String createSpentDescription(Item item, Integer amount, String description){
         return String.format("Spent %d %s for %s", amount, item.getItemSubType(), description);
+    }
+
+    private static String createExchangeDescription(int amount1, ItemSubType itemSubType1, int amount2, ItemSubType itemSubType2) {
+        return String.format("Exchanged %s %s for %s %s", amount1, itemSubType1, amount2, itemSubType2);
     }
 }

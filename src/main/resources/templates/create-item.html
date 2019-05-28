@@ -7,9 +7,15 @@
 <div class="container">
     <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
 
-    <h1 th:inline="text"> [[${caption}]] </h1>
     <div th:if="${item.id != null}" th:object="${item}">
-        <a th:href="${'/view-item/' + item.id}">View</a>
+        <table class="table table-view">
+            <caption th:text="${caption}"></caption>
+            <tbody>
+            <td><a th:href="${'/view-item/' + item.id}">View</a></td>
+            <td></td>
+            <td></td>
+            </tbody>
+        </table>
     </div>
     <div>
         <form class="form-horizontal" th:object="${item}" th:action="@{/item/create}" method="post">
