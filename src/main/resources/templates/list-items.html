@@ -8,12 +8,19 @@
     <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
 
     <div>
-        <a class="button" href="/add-item">Add an item</a>
+        <table class="table table-view">
+            <caption th:text="${caption}"></caption>
+            <tbody>
+            <td><a class="button" href="/add-item">Loot an item</a></td>
+            <td><a class="button" href="/buy-item">Buy an item</a></td>
+            <td></td>
+            </tbody>
+        </table>
     </div>
 
     <div th:if="${not #lists.isEmpty(items)}">
         <table class="table table-striped">
-            <caption>Items</caption>
+<!--            <caption>Items</caption>-->
             <thead>
             <tr>
                 <th>Name</th>
@@ -45,7 +52,8 @@
                 <td th:text="${item.weight}"></td>
                 <td th:text="${item.source}"></td>
                 <td th:text="${item.tags}"></td>
-                <td><a th:if="${item.container != null}" th:text="${item.container.name}" th:href="${'/query/container/' + item.container.id} +'/items'"></a></td>
+                <td><a th:if="${item.container != null}" th:text="${item.container.name}"
+                       th:href="${'/query/container/' + item.container.id} +'/items'"></a></td>
                 <td th:unless="${item.container != null}"></td>
             </tr>
             </tbody>

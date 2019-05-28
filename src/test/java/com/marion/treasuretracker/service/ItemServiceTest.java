@@ -276,7 +276,7 @@ public class ItemServiceTest {
         Assert.assertEquals(115, (long) goldCoins.getAmount());
         Assert.assertEquals(0, (long) moreGoldCoins.getAmount());
     }
-    
+
     @Test
     public void testUpdateContainerWeight_CreateItem() throws Exception {
         Container container = createTestContainer();
@@ -314,15 +314,130 @@ public class ItemServiceTest {
         Assert.assertEquals("ID hasn't been updated", item.getId(), result.getId());
         container1 = containerService.findContainerById(container1.getId());
         container2 = containerService.findContainerById(container2.getId());
-        Assert.assertEquals("", 2.0f, container1.getCurrentWeight(), 0.001f);
-        Assert.assertEquals("", 0f, container2.getCurrentWeight(), 0.001f);
+        Assert.assertEquals("Incorrect weight for container 1", 2.0f, container1.getCurrentWeight(), 0.001f);
+        Assert.assertEquals("Incorrect weight for container 2", 0f, container2.getCurrentWeight(), 0.001f);
 
         result.setContainer(container2);
         itemService.updateItem(result);
         container1 = containerService.findContainerById(container1.getId());
         container2 = containerService.findContainerById(container2.getId());
-        Assert.assertEquals("", 0f, container1.getCurrentWeight(), 0.001f);
-        Assert.assertEquals("", 2.0f, container2.getCurrentWeight(), 0.001f);
+        Assert.assertEquals("Incorrect weight for container 1", 0f, container1.getCurrentWeight(), 0.001f);
+        Assert.assertEquals("Incorrect weight for container 2", 2.0f, container2.getCurrentWeight(), 0.001f);
     }
 
+    @Test
+    public void convertCoinDenomination_SilverToPlatinum() throws Exception {
+        Container container = createTestContainer();
+        Item item = new Item();
+        item.setName("Silver Coins");
+        item.setItemType(ItemType.coin);
+        item.setItemSubType(ItemSubType.silver);
+        item.setContainer(container);
+        item.setAmount(1000);
+
+        Item result = itemService.createItem(item);
+
+        Item platinumCoins = itemService.convertCoinDenomination(result, ItemSubType.platinum, 500);
+        item = itemService.findItemById(item.getId());
+
+        Assert.assertEquals("Value incorrect for Silver", 500, (int) item.getAmount());
+        Assert.assertEquals("Value incorrect for Platinum", 5, (int) platinumCoins.getAmount());
+    }
+
+    @Test
+    public void convertCoinDenomination_CopperToGold() throws Exception {
+        Container container = createTestContainer();
+        Item item = new Item();
+        item.setName("Copper Coins");
+        item.setItemType(ItemType.coin);
+        item.setItemSubType(ItemSubType.copper);
+        item.setContainer(container);
+        item.setAmount(1000);
+
+        Item result = itemService.createItem(item);
+
+        Item goldCoins = itemService.convertCoinDenomination(result, ItemSubType.gold, 1000);
+        item = itemService.findItemById(item.getId());
+
+        Assert.assertEquals("Value incorrect for Copper", 0, (int) item.getAmount());
+        Assert.assertEquals("Value incorrect for Gold", 10, (int) goldCoins.getAmount());
+    }
+
+    @Test
+    public void convertCoinDenomination_PlatinumToElectrum() throws Exception {
+        Container container = createTestContainer();
+        Item item = new Item();
+        item.setName("Platinum Coins");
+        item.setItemType(ItemType.coin);
+        item.setItemSubType(ItemSubType.platinum);
+        item.setContainer(container);
+        item.setAmount(100);
+
+        Item result = itemService.createItem(item);
+
+        Item electrumCoins = itemService.convertCoinDenomination(result, ItemSubType.electrum, 50);
+        item = itemService.findItemById(item.getId());
+
+        Assert.assertEquals("Value incorrect for Platinum", 50, (int) item.getAmount());
+        Assert.assertEquals("Value incorrect for Electrum", 2500, (int) electrumCoins.getAmount());
+    }
+
+    @Test(expected = InvalidItemException.class)
+    public void convertCoinDenomination_NotEnoughToConvernt() throws Exception {
+        Container container = createTestContainer();
+        Item item = new Item();
+        item.setName("Copper Coins");
+        item.setItemType(ItemType.coin);
+        item.setItemSubType(ItemSubType.copper);
+        item.setContainer(container);
+        item.setAmount(100);
+
+        Item result = itemService.createItem(item);
+
+        Item platinumCoins = itemService.convertCoinDenomination(result, ItemSubType.platinum, 100);
+    }
+
+    @Test(expected = InvalidItemException.class)
+    public void convertCoinDenomination_SpendMoreThanHave() throws Exception {
+        Container container = createTestContainer();
+        Item item = new Item();
+        item.setName("Copper Coins");
+        item.setItemType(ItemType.coin);
+        item.setItemSubType(ItemSubType.copper);
+        item.setContainer(container);
+        item.setAmount(100);
+
+        Item result = itemService.createItem(item);
+
+        Item platinumCoins = itemService.convertCoinDenomination(result, ItemSubType.platinum, 10000);
+    }
+
+    @Test
+    public void testPurchaseItem() throws Exception {
+        Container container = createTestContainer();
+        Item item = new Item();
+        item.setName("Gold Coins");
+        item.setItemType(ItemType.coin);
+        item.setItemSubType(ItemSubType.gold);
+        item.setContainer(container);
+        item.setAmount(100);
+
+        item = itemService.lootItem(item);
+
+        Item purchase = new Item();
+        purchase.setName("Gem");
+        purchase.setDescription("A gem!");
+        purchase.setItemType(ItemType.gem);
+        purchase.setItemSubType(ItemSubType.garnet);
+        purchase.setAmount(1);
+        purchase.setContainer(container);
+        purchase.setValue(50f);
+        purchase = itemService.purchaseItem(purchase, 50, ItemSubType.gold);
+
+        item = itemService.findItemById(item.getId());
+
+        Assert.assertEquals("Value incorrect for Gold", 50, (int) item.getAmount());
+        Assert.assertNotNull("Item not created", purchase);
+        Assert.assertNotNull("Item not created", purchase.getId());
+    }
 }
