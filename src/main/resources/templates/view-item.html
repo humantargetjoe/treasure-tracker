@@ -7,9 +7,15 @@
 <div class="container">
     <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
 
-    <h1 th:inline="text"> [[${caption}]] </h1>
     <div th:object="${item}">
-        <a th:href="${'/edit-item/' + item.id}">Edit</a>
+        <table class="table table-view">
+            <caption th:text="${caption}"></caption>
+            <tbody>
+            <td><a th:href="${'/edit-item/' + item.id}">Edit</a></td>
+            <td><a th:if="${item.itemType.toString().equals('coin')}" th:href="${'/exchange-item/' + item.id}">Exchange</a></td>
+            <td></td>
+            </tbody>
+        </table>
     </div>
     <div>
         <form class="form-horizontal" th:object="${item}" th:action="@{/item/sell}" method="post">
@@ -68,7 +74,7 @@
                     <p class="form-control-static" th:text="${item.container.name}"></p>
                 </div>
             </div>
-            <div class="row" th:if="${item.itemType != 'coin'}">
+            <div class="row" th:if="${!item.itemType.toString().equals('coin')}">
                 <button type="submit" class="btn btn-default">Sell</button>
             </div>
         </form>

@@ -1,9 +1,7 @@
 package com.marion.treasuretracker.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marion.treasuretracker.model.Item;
-import com.marion.treasuretracker.model.ItemSubType;
-import com.marion.treasuretracker.model.ItemType;
+import com.marion.treasuretracker.model.*;
 import com.marion.treasuretracker.service.ContainerService;
 import com.marion.treasuretracker.service.ItemService;
 import org.apache.commons.logging.Log;
@@ -44,7 +42,27 @@ public class ItemController {
         model.addAttribute("itemTypes", ItemType.values());
         model.addAttribute("itemSubTypes", ItemSubType.values());
         model.addAttribute("containers", containerService.listContainers());
-        return "add-item";
+        return "create-item";
+    }
+
+    @RequestMapping(value = "/buy-item", method = RequestMethod.GET)
+    public String buyItem(ModelMap model) {
+        model.addAttribute("caption", "New Item");
+        model.addAttribute("wrapper", new ItemWrapper(new Item()));
+        model.addAttribute("itemTypes", ItemType.values());
+        model.addAttribute("itemSubTypes", ItemSubType.values());
+        model.addAttribute("containers", containerService.listContainers());
+        return "buy-item";
+    }
+
+    @RequestMapping(value = "/exchange-item/{id}", method = RequestMethod.GET)
+    public String exchangeItem(@PathVariable(name = "id") String id, ModelMap model) {
+        model.addAttribute("caption", "Exchange Item");
+        model.addAttribute("wrapper", new ItemWrapper(itemService.findItemById(id)));
+        model.addAttribute("itemTypes", ItemType.values());
+        model.addAttribute("itemSubTypes", Constants.COINS);
+        model.addAttribute("containers", containerService.listContainers());
+        return "exchange-item";
     }
 
     @RequestMapping(value = "/view-item/{id}", method = RequestMethod.GET)
@@ -61,13 +79,28 @@ public class ItemController {
         model.addAttribute("itemTypes", ItemType.values());
         model.addAttribute("itemSubTypes", ItemSubType.values());
         model.addAttribute("containers", containerService.listContainers());
-        return "add-item";
+
+        return "create-item";
     }
 
     @RequestMapping(value = "item/create", method = RequestMethod.POST)
     public String createItem(Item item) throws Exception {
         log.info(objectMapper.writeValueAsString(item));
-        itemService.createItem(item);
+        itemService.createOrUpdateItem(item);
+        return "redirect:/list-items";
+    }
+
+    @RequestMapping(value = "item/purchase", method = RequestMethod.POST)
+    public String purchaseItem(ItemWrapper itemWrapper) throws Exception {
+        log.info(objectMapper.writeValueAsString(itemWrapper));
+        itemService.purchaseItem(itemWrapper.getItem(), itemWrapper.getAmount(), itemWrapper.getItemSubType());
+        return "redirect:/list-items";
+    }
+
+    @RequestMapping(value = "item/exchange", method = RequestMethod.POST)
+    public String exchangeItem(ItemWrapper itemWrapper) throws Exception {
+        log.info(objectMapper.writeValueAsString(itemWrapper));
+        itemService.convertCoinDenomination(itemWrapper.getItem(), itemWrapper.getItemSubType(), itemWrapper.getAmount());
         return "redirect:/list-items";
     }
 

@@ -6,4 +6,6 @@ public enum ReasonType {
     MOVED,
     SOLD,
     SPENT,
+    PURCHASED,
+    LOOTED,
 }

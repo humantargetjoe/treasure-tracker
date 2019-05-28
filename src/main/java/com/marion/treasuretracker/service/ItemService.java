@@ -57,15 +57,17 @@ public class ItemService {
         }
     }
 
-    @Transactional
-    public Item createItem(Item item) throws InvalidItemException {
+    public Item createOrUpdateItem(Item item) throws InvalidItemException {
         if (item.getId() != null) {
             return updateItem(item);
         }
+        return lootItem(item);
+    }
 
+    @Transactional
+    public Item createItem(Item item) throws InvalidItemException {
         validateAndSave(item);
         adjustContainerWeight(item.getContainer());
-        changeLogService.recordAcquiredItem(item);
 
         return item;
     }
@@ -82,6 +84,33 @@ public class ItemService {
         adjustContainerWeight(previous.getContainer());
         adjustContainerWeight(item.getContainer());
         changeLogService.recordUpdateItem(previous, item);
+
+        return item;
+    }
+
+    @Transactional
+    public Item purchaseItem(Item item, int amount, ItemSubType itemSubType) throws InvalidItemException, InvalidSaleException {
+        List<Item> coins = queryItems(
+                String.format(
+                        Queries.ITEMS_BY_TYPE_AND_SUBTYPE,
+                        ItemType.coin, itemSubType));
+
+        for (Item coin : coins) {
+            if (coin.getAmount() >= amount) {
+                spendCoins(coin, amount, String.format("purchase of %d '%s'", item.getAmount(), item.getName()));
+                item = createItem(item);
+                changeLogService.recordPurchasedItem(item, amount, ItemType.coin, itemSubType);
+
+                return item;
+            }
+        }
+
+        return null;
+    }
+
+    public Item lootItem(Item item) throws InvalidItemException {
+        item = createItem(item);
+        changeLogService.recordLootedItem(item);
 
         return item;
     }
@@ -171,13 +200,16 @@ public class ItemService {
         changeLogService.recordSoldItem(item, amount, value);
     }
 
-    @Transactional
     public void spendCoins(Item item) throws InvalidSaleException, InvalidItemException {
         int amount = item.getAmount();
         String description = item.getDescription();
 
         item = findItemById(item.getId());
 
+        spendCoins(item, amount, description);
+    }
+
+    public void spendCoins(Item item, int amount, String description) throws InvalidSaleException, InvalidItemException {
         if (item.getItemType() != ItemType.coin) {
             throw new InvalidSaleException("Can only spend coins.");
         }
@@ -194,6 +226,7 @@ public class ItemService {
 
         changeLogService.recordSpentItem(item, amount, description);
     }
+
 
     public Item findItemById(String id) {
         return findItemById(Integer.parseInt(id));
@@ -267,7 +300,7 @@ public class ItemService {
         return totals;
     }
 
-    public Map<ItemSubType, Item> queryCoinsInContainer(Integer containerId) throws Exception {
+    public Map<ItemSubType, Item> queryCoinsInContainer(Integer containerId) throws InvalidItemException {
         List<Item> coins = queryItems(String.format(Queries.ITEMS_BY_TYPE_IN_CONTAINER, ItemType.coin, containerId));
 
         Map<ItemSubType, Item> map = new HashMap<>();
@@ -278,7 +311,46 @@ public class ItemService {
         return map;
     }
 
-    void mergeCoinsInContainer(ItemSubType itemSubType, Container container) throws InvalidItemException {
+    public Item convertCoinDenomination(Item item, ItemSubType itemSubType, int amount) throws InvalidItemException {
+        item = findItemById(item.getId());
+
+        if (item.getItemType() != ItemType.coin || item.getItemSubType() == itemSubType) {
+            return item;
+        }
+
+        float adjustedAmount = convertToGold(item.getItemSubType(), amount);
+
+        // Trying to convert more than is there
+        if (adjustedAmount > item.getValue()) {
+            throw new InvalidItemException("Cannot exchange, inadequate value.");
+        }
+
+        adjustedAmount = convertFromGold(itemSubType, adjustedAmount);
+
+        // Not enough value to exchange to
+        if (adjustedAmount < 1.0f) {
+            throw new InvalidItemException("Cannot exchange, fractional value.");
+        }
+
+        item.setAmount(item.getAmount() - amount);
+
+        Item coin = new Item();
+        coin.setName(String.format("%s Coins", itemSubType.name()));
+        coin.setItemType(ItemType.coin);
+        coin.setItemSubType(itemSubType);
+        coin.setSource(String.format("Changed from %d %s coins", amount, item.getItemSubType()));
+        coin.setContainer(item.getContainer());
+        coin.setAmount((int) adjustedAmount);
+
+        updateItem(item);
+        coin = createItem(coin);
+
+        changeLogService.recordExchangeCoins(coin, item.getItemSubType(), amount);
+
+        return coin;
+    }
+
+    private void mergeCoinsInContainer(ItemSubType itemSubType, Container container) throws InvalidItemException {
         List<Item> results = queryItems(String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE_IN_CONTAINER, ItemType.coin, itemSubType, container.getId()));
 
         if (results.size() <= 1) {
@@ -345,7 +417,7 @@ public class ItemService {
         return value;
     }
 
-    private static float convertToGold(ItemSubType subType, int amount) {
+    private static float convertToGold(ItemSubType subType, float amount) {
         switch (subType) {
             case platinum:
                 return amount * Constants.goldPerPlatinum;
@@ -355,6 +427,20 @@ public class ItemService {
                 return amount * Constants.goldPerSilver;
             case copper:
                 return amount * Constants.goldPerCopper;
+        }
+        return amount;
+    }
+
+    private static float convertFromGold(ItemSubType subType, float amount) {
+        switch (subType) {
+            case platinum:
+                return amount / Constants.goldPerPlatinum;
+            case electrum:
+                return amount / Constants.goldPerElectrum;
+            case silver:
+                return amount / Constants.goldPerSilver;
+            case copper:
+                return amount / Constants.goldPerCopper;
         }
         return amount;
     }
@@ -385,4 +471,5 @@ public class ItemService {
             log.error(icEx.getMessage(), icEx);
         }
     }
+
 }
