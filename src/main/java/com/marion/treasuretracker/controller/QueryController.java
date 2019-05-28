@@ -36,11 +36,13 @@ public class QueryController {
         // need a service implementation to delegate
 
         model.addAttribute("items", itemService.queryItems(treasureQuery.getQuery()));
+        model.addAttribute("caption", treasureQuery.getQuery());
         return "list-items";
     }
 
     @RequestMapping(value = "/query/container/{id}/items", method = RequestMethod.GET)
     public String itemsInContainer(@PathVariable Integer id, ModelMap model) {
+        model.addAttribute("caption", containerService.findContainerById(id).getName());
         model.addAttribute("items", queryService.queryItemsInContainer(id));
         model.addAttribute("containers", containerService.listContainers());
         return "list-items";

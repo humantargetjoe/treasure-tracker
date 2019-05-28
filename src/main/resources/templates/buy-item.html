@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+<body>
+
+<div class="container">
+    <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
+
+    <div th:if="${wrapper.item.id != null}" th:object="${wrapper.item}">
+        <table class="table table-view">
+            <caption th:text="${caption}"></caption>
+            <tbody>
+            <td><a th:href="${'/view-item/' + wrapper.item.id}">View</a></td>
+            <td></td>
+            <td></td>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <form class="form-horizontal" th:object="${wrapper}" th:action="@{/item/purchase}" method="post">
+            <input type="hidden" th:field="${wrapper.item.id}"/>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Name:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.item.name}"/></div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Description:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.item.description}" maxlength="255"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Amount:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.item.amount}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Type:</label>
+                <div class="col-sm-10">
+                    <select class="form-control" th:field="*{item.itemType}">
+                        <option th:each="itemType : ${itemTypes}"
+                                th:text="${itemType}"
+                                th:value="${itemType}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">SubType:</label>
+                <div class="col-sm-10">
+                    <select class="form-control" th:field="*{item.itemSubType}">
+                        <option th:each="itemSubType : ${itemSubTypes}"
+                                th:text="${itemSubType}"
+                                th:value="${itemSubType}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Value:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.item.value}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Weight:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.item.weight}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Height:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.item.height}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Width:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.item.width}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Length:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.item.length}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Source:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.item.source}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Tags:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.item.tags}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Container:</label>
+                <div class="col-sm-10">
+                    <select class="form-control" th:field="*{item.container}">
+                        <option th:each="container : ${containers}"
+                                th:text="${container.name}"
+                                th:value="${container.id}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Cost:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.amount}"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Type:</label>
+                <div class="col-sm-10">
+                    <select class="form-control" th:field="${wrapper.itemType}">
+                        <option th:each="itemType : ${itemTypes}"
+                                th:text="${itemType}"
+                                th:value="${itemType}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">SubType:</label>
+                <div class="col-sm-10">
+                    <select class="form-control" th:field="${wrapper.itemSubType}">
+                        <option th:each="itemSubType : ${itemSubTypes}"
+                                th:text="${itemSubType}"
+                                th:value="${itemSubType}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

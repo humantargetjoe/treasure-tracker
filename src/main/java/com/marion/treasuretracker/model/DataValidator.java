@@ -81,6 +81,7 @@ public class DataValidator {
                                 item.getItemSubType() == ItemSubType.onyx ||
                                 item.getItemSubType() == ItemSubType.pearl ||
                                 item.getItemSubType() == ItemSubType.quartz ||
+                                item.getItemSubType() == ItemSubType.ruby ||
                                 item.getItemSubType() == ItemSubType.sapphire ||
                                 item.getItemSubType() == ItemSubType.tigerseye ||
                                 item.getItemSubType() == ItemSubType.tourmaline ||
