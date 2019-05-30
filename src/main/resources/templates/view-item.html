@@ -13,7 +13,7 @@
             <tbody>
             <td><a th:href="${'/edit-item/' + item.id}">Edit</a></td>
             <td><a th:if="${item.itemType.toString().equals('coin')}" th:href="${'/exchange-item/' + item.id}">Exchange</a></td>
-            <td></td>
+            <td><a th:href="${'/move-item/' + item.id}">Move</a></td>
             </tbody>
         </table>
     </div>

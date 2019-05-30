@@ -1,8 +1,8 @@
 package com.marion.treasuretracker.model;
 
-public class ItemWrapper {
+public class ItemBuyWrapper {
 
-    public ItemWrapper(Item item) {
+    public ItemBuyWrapper(Item item) {
         this.setItem(item);
     }
 
