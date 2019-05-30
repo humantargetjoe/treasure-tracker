@@ -89,6 +89,40 @@ public class ItemService {
     }
 
     @Transactional
+    public Item moveItem(Item item, int amount) throws InvalidItemException {
+        if (item.getId() == null) {
+            throw new InvalidItemException("Item does not exist.");
+        }
+        Item previous = findItemById(item.getId()).copy();
+        previous.setId(item.getId());
+
+        Container destination = item.getContainer();
+        item = previous.copy();
+        item.setAmount(amount);
+        item.setContainer(destination);
+
+        if (previous.getAmount() < amount) {
+            throw new InvalidItemException("Can't move more than the amount in the item.");
+        }
+
+        if (previous.getContainer().getId().equals(item.getContainer().getId())) {
+            log.error("SAME CONTAINER");
+            return previous;
+        }
+
+        previous.setAmount(previous.getAmount() - amount);
+        validateAndSave(previous);
+        validateAndSave(item);
+        adjustContainerWeight(previous.getContainer());
+        adjustContainerWeight(item.getContainer());
+
+        changeLogService.recordMoveItemContainer(previous);
+        changeLogService.recordMoveItemContainer(item);
+
+        return item;
+    }
+
+    @Transactional
     public Item purchaseItem(Item item, int amount, ItemSubType itemSubType) throws InvalidItemException, InvalidSaleException {
         List<Item> coins = queryItems(
                 String.format(

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <!--/*/ <th:block th:include="fragments/header :: header"></th:block> /*/-->
+<body>
+
+<div class="container">
+    <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
+
+    <div th:if="${wrapper.item.id != null}" th:object="${wrapper.item}">
+        <table class="table table-view">
+            <caption th:text="${caption}"></caption>
+            <tbody>
+            <td><a th:href="${'/view-item/' + wrapper.item.id}">View</a></td>
+            <td></td>
+            <td></td>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <form class="form-horizontal" th:object="${wrapper}" th:action="@{/item/move}" method="post">
+            <input type="hidden" th:field="${wrapper.item.id}"/>
+            <label class="col-sm-2 control-label">Name:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.name}"></p></div>
+            <label class="col-sm-2 control-label">Description:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.description}" maxlength="255"></p>
+            </div>
+            <label class="col-sm-2 control-label">Amount:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.amount}"></p>
+            </div>
+            <label class="col-sm-2 control-label">Type:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.itemType}"></p>
+            </div>
+            <label class="col-sm-2 control-label">SubType:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.itemSubType}"></p>
+            </div>
+            <label class="col-sm-2 control-label">Value:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.value}"></p>
+            </div>
+            <label class="col-sm-2 control-label">Weight:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.weight}"></p>
+            </div>
+            <label class="col-sm-2 control-label">Height:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.height}"></p>
+            </div>
+            <label class="col-sm-2 control-label">Width:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.width}"></p>
+            </div>
+            <label class="col-sm-2 control-label">Length:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.length}"></p>
+            </div>
+            <label class="col-sm-2 control-label">Source:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.source}"></p>
+            </div>
+            <label class="col-sm-2 control-label">Tags:</label>
+            <div class="col-sm-10">
+                <p class="form-control-static" th:text="${wrapper.item.tags}"></p>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Container:</label>
+                <div class="col-sm-10">
+                    <select class="form-control" th:field="*{item.container}">
+                        <option th:each="container : ${containers}"
+                                th:text="${container.name}"
+                                th:value="${container.id}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Quantity:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" th:field="${wrapper.amount}"/>
+                </div>
+            <div class="row">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
