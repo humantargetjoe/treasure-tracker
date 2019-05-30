@@ -48,17 +48,25 @@ public class ItemController {
     @RequestMapping(value = "/buy-item", method = RequestMethod.GET)
     public String buyItem(ModelMap model) {
         model.addAttribute("caption", "New Item");
-        model.addAttribute("wrapper", new ItemWrapper(new Item()));
+        model.addAttribute("wrapper", new ItemBuyWrapper(new Item()));
         model.addAttribute("itemTypes", ItemType.values());
         model.addAttribute("itemSubTypes", ItemSubType.values());
         model.addAttribute("containers", containerService.listContainers());
         return "buy-item";
     }
 
+    @RequestMapping(value = "/move-item/{id}", method = RequestMethod.GET)
+    public String moveItem(@PathVariable(name = "id") String id, ModelMap model) {
+        model.addAttribute("caption", "Move Item");
+        model.addAttribute("wrapper", new ItemMoveWrapper(itemService.findItemById(id)));
+        model.addAttribute("containers", containerService.listContainers());
+        return "move-item";
+    }
+
     @RequestMapping(value = "/exchange-item/{id}", method = RequestMethod.GET)
     public String exchangeItem(@PathVariable(name = "id") String id, ModelMap model) {
         model.addAttribute("caption", "Exchange Item");
-        model.addAttribute("wrapper", new ItemWrapper(itemService.findItemById(id)));
+        model.addAttribute("wrapper", new ItemBuyWrapper(itemService.findItemById(id)));
         model.addAttribute("itemTypes", ItemType.values());
         model.addAttribute("itemSubTypes", Constants.COINS);
         model.addAttribute("containers", containerService.listContainers());
@@ -91,16 +99,16 @@ public class ItemController {
     }
 
     @RequestMapping(value = "item/purchase", method = RequestMethod.POST)
-    public String purchaseItem(ItemWrapper itemWrapper) throws Exception {
-        log.info(objectMapper.writeValueAsString(itemWrapper));
-        itemService.purchaseItem(itemWrapper.getItem(), itemWrapper.getAmount(), itemWrapper.getItemSubType());
+    public String purchaseItem(ItemBuyWrapper itemBuyWrapper) throws Exception {
+        log.info(objectMapper.writeValueAsString(itemBuyWrapper));
+        itemService.purchaseItem(itemBuyWrapper.getItem(), itemBuyWrapper.getAmount(), itemBuyWrapper.getItemSubType());
         return "redirect:/list-items";
     }
 
     @RequestMapping(value = "item/exchange", method = RequestMethod.POST)
-    public String exchangeItem(ItemWrapper itemWrapper) throws Exception {
-        log.info(objectMapper.writeValueAsString(itemWrapper));
-        itemService.convertCoinDenomination(itemWrapper.getItem(), itemWrapper.getItemSubType(), itemWrapper.getAmount());
+    public String exchangeItem(ItemBuyWrapper itemBuyWrapper) throws Exception {
+        log.info(objectMapper.writeValueAsString(itemBuyWrapper));
+        itemService.convertCoinDenomination(itemBuyWrapper.getItem(), itemBuyWrapper.getItemSubType(), itemBuyWrapper.getAmount());
         return "redirect:/list-items";
     }
 
@@ -108,6 +116,13 @@ public class ItemController {
     public String sellItem(Item item) throws Exception {
         log.info(objectMapper.writeValueAsString(item));
         itemService.sellItem(item);
+        return "redirect:/list-items";
+    }
+
+    @RequestMapping(value = "/item/move", method = RequestMethod.POST)
+    public String exchangeItem(ItemMoveWrapper wrapper) throws Exception {
+        log.info(objectMapper.writeValueAsString(wrapper));
+        itemService.moveItem(wrapper.getItem(), wrapper.getAmount());
         return "redirect:/list-items";
     }
 

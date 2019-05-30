@@ -163,6 +163,17 @@ public class ChangeLogService {
         changeLogRepository.save(changeLog);
     }
 
+    void recordMoveItemContainer(Item item) {
+        ChangeLog changeLog = new ChangeLog();
+        changeLog.setTimestamp(new Date());
+        changeLog.setReason(ReasonType.MOVED);
+        changeLog.setDescription(createMoveDescription(item));
+        changeLog.setItem(item);
+        changeLog.setContainer(item.getContainer());
+
+        changeLogRepository.save(changeLog);
+    }
+
     private static String createAcquisitionDescription(Item item) {
         return String.format("Acquired '%s' from '%s'",
                 item.getName(),
@@ -250,5 +261,9 @@ public class ChangeLogService {
 
     private static String createExchangeDescription(int amount1, ItemSubType itemSubType1, int amount2, ItemSubType itemSubType2) {
         return String.format("Exchanged %s %s for %s %s", amount1, itemSubType1, amount2, itemSubType2);
+    }
+
+    private static String createMoveDescription(Item item) {
+        return String.format("Moved %d %s to %s", item.getAmount(), item.getName(), item.getContainer().getName());
     }
 }
