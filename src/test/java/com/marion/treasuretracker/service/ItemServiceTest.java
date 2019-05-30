@@ -440,4 +440,32 @@ public class ItemServiceTest {
         Assert.assertNotNull("Item not created", purchase);
         Assert.assertNotNull("Item not created", purchase.getId());
     }
+
+    @Test
+    public void testMoveItem() throws Exception {
+        Container container1 = createTestContainer(1);
+        Container container2 = createTestContainer(1);
+        Item item = new Item();
+        item.setName("Agate");
+        item.setItemType(ItemType.gem);
+        item.setItemSubType(ItemSubType.agate);
+        item.setContainer(container1);
+        item.setValue(10f);
+        item.setAmount(100);
+
+        item = itemService.createOrUpdateItem(item);
+
+        Item modified = item.copy();
+        modified.setId(item.getId());
+        modified.setContainer(container2);
+
+        Item result = itemService.moveItem(modified, 30);
+
+        item = itemService.findItemById(item.getId());
+        result = itemService.findItemById(result.getId());
+
+        Assert.assertEquals("incorrect amount", 70, (int) item.getAmount());
+        Assert.assertEquals("incorrect amount", 30, (int) result.getAmount());
+        Assert.assertNotEquals("incorrect container", item.getContainer().getId(), result.getContainer().getId());
+    }
 }
