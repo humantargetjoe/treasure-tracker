@@ -287,34 +287,38 @@ public class ItemService {
     }
 
     public Totals collectTotals() {
+        return collectTotals(null);
+    }
+
+    public Totals collectTotals(Container container) {
         Totals totals = new Totals();
-        totals.getCoins().setTotal(totalCoinValueInGold());
-        totals.getCoins().setCopper(totalCoinAmount(ItemSubType.copper));
-        totals.getCoins().setSilver(totalCoinAmount(ItemSubType.silver));
-        totals.getCoins().setElectrum(totalCoinAmount(ItemSubType.electrum));
-        totals.getCoins().setGold(totalCoinAmount(ItemSubType.gold));
-        totals.getCoins().setPlatinum(totalCoinAmount(ItemSubType.platinum));
+        totals.getCoins().setTotal(totalCoinValueInGold(container));
+        totals.getCoins().setCopper(totalCoinAmount(ItemSubType.copper, container));
+        totals.getCoins().setSilver(totalCoinAmount(ItemSubType.silver, container));
+        totals.getCoins().setElectrum(totalCoinAmount(ItemSubType.electrum, container));
+        totals.getCoins().setGold(totalCoinAmount(ItemSubType.gold, container));
+        totals.getCoins().setPlatinum(totalCoinAmount(ItemSubType.platinum, container));
 
         Totals.Valuable gemTotal = totals.addTotal(ItemType.gem);
         Totals.Valuable jewelryTotal = totals.addTotal(ItemType.jewelry);
         Totals.Valuable otherTotal = totals.addTotal(ItemType.other);
         for (ItemSubType subType : Constants.GEMS) {
             Totals.Valuable valuable = totals.addGem(subType);
-            totalAmountAndValue(valuable, ItemType.gem, subType);
+            totalAmountAndValue(valuable, ItemType.gem, subType, container);
             gemTotal.setCount(gemTotal.getCount() + valuable.getCount());
             gemTotal.setValue(gemTotal.getValue() + valuable.getValue());
         }
 
         for (ItemSubType subType : Constants.JEWELRY) {
             Totals.Valuable valuable = totals.addJewelry(subType);
-            totalAmountAndValue(valuable, ItemType.jewelry, subType);
+            totalAmountAndValue(valuable, ItemType.jewelry, subType, container);
             jewelryTotal.setCount(jewelryTotal.getCount() + valuable.getCount());
             jewelryTotal.setValue(jewelryTotal.getValue() + valuable.getValue());
         }
 
         for (ItemSubType subType : Constants.OTHER) {
             Totals.Valuable valuable = totals.addOther(subType);
-            totalAmountAndValue(valuable, ItemType.other, subType);
+            totalAmountAndValue(valuable, ItemType.other, subType, container);
             otherTotal.setCount(otherTotal.getCount() + valuable.getCount());
             otherTotal.setValue(otherTotal.getValue() + valuable.getValue());
         }
@@ -322,7 +326,7 @@ public class ItemService {
         // Add miscellaneous things to totals, like weapons that are more decorative than functional
         Totals.Valuable valuable = totals.addOther(ItemSubType.none);
         valuable.setName("Weapons");
-        totalAmountAndValue(valuable, ItemType.weapon, ItemSubType.none);
+        totalAmountAndValue(valuable, ItemType.weapon, ItemSubType.none, container);
         otherTotal.setCount(otherTotal.getCount() + valuable.getCount());
         otherTotal.setValue(otherTotal.getValue() + valuable.getValue());
 
@@ -407,10 +411,20 @@ public class ItemService {
         addCoins(baseCoin);
     }
 
-    private void totalAmountAndValue(Totals.Valuable valuable, ItemType itemType, ItemSubType itemSubType) {
+    private void totalAmountAndValue(Totals.Valuable valuable, ItemType itemType, ItemSubType itemSubType, Container container) {
+        String query = null;
+        if (container != null) {
+            query = String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE_IN_CONTAINER, itemType, itemSubType, container.getId());
+        } else {
+            query = String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE, itemType, itemSubType);
+        }
+        totalAmountAndValue(valuable, query);
+    }
+
+    private void totalAmountAndValue(Totals.Valuable valuable, String query) {
         int total = 0;
         Float value = 0f;
-        List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE, itemType, itemSubType));
+        List<Item> items = queryItems(query);
         for (Item item : items) {
             // Magic rings, etc., shouldn't show up here despite being jewelry
             if (item.getValue() != null) {
@@ -426,9 +440,15 @@ public class ItemService {
         valuable.setValue(value);
     }
 
-    private int totalCoinAmount(ItemSubType itemSubType) {
+    private int totalCoinAmount(ItemSubType itemSubType, Container container) {
         int total = 0;
-        List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE, ItemType.coin, itemSubType));
+        String query = null;
+        if (container != null) {
+            query = String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE_IN_CONTAINER, ItemType.coin, itemSubType, container.getId());
+        } else {
+            query = String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE, ItemType.coin, itemSubType);
+        }
+        List<Item> items = queryItems(query);
         for (Item item : items) {
             total += item.getAmount();
         }
@@ -436,7 +456,18 @@ public class ItemService {
     }
 
     float totalCoinValueInGold() {
-        List<Item> items = queryItems(String.format(Queries.ITEMS_BY_TYPE, ItemType.coin));
+        return totalCoinValueInGold(null);
+    }
+
+    float totalCoinValueInGold(Container container) {
+        String query = null;
+        if (container != null) {
+            query = String.format(Queries.ITEMS_BY_TYPE_IN_CONTAINER, ItemType.coin, container.getId());
+        } else {
+            query = String.format(Queries.ITEMS_BY_TYPE, ItemType.coin);
+        }
+
+        List<Item> items = queryItems(query);
 
         float value = 0.0f;
         try {
