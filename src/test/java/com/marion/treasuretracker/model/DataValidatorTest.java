@@ -13,7 +13,7 @@ public class DataValidatorTest {
         item.setName("Coins");
         item.setItemType(ItemType.coin);
         item.setAmount(1);
-        for (ItemSubType itemSubType: Constants.COINS) {
+        for (ItemSubType itemSubType: Constants.Coins) {
             item.setItemSubType(itemSubType);
             Assert.assertTrue("Failed to validate " + itemSubType, DataValidator.validateCoins(item));
         }
@@ -25,7 +25,7 @@ public class DataValidatorTest {
         item.setName("Gems");
         item.setItemType(ItemType.gem);
         item.setAmount(1);
-        for (ItemSubType itemSubType: Constants.GEMS) {
+        for (ItemSubType itemSubType: Constants.Gems) {
             item.setItemSubType(itemSubType);
             Assert.assertTrue("Failed to validate " + itemSubType, DataValidator.validateGems(item));
         }
@@ -37,7 +37,7 @@ public class DataValidatorTest {
         item.setName("Jewelry");
         item.setItemType(ItemType.jewelry);
         item.setAmount(1);
-        for (ItemSubType itemSubType : Constants.JEWELRY) {
+        for (ItemSubType itemSubType : Constants.Jewelry) {
             item.setItemSubType(itemSubType);
             Assert.assertTrue("Failed to validate " + itemSubType, DataValidator.validateJewelry(item));
         }

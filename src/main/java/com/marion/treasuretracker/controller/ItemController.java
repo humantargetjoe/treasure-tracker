@@ -68,7 +68,7 @@ public class ItemController {
         model.addAttribute("caption", "Exchange Item");
         model.addAttribute("wrapper", new ItemBuyWrapper(itemService.findItemById(id)));
         model.addAttribute("itemTypes", ItemType.values());
-        model.addAttribute("itemSubTypes", Constants.COINS);
+        model.addAttribute("itemSubTypes", Constants.Coins);
         model.addAttribute("containers", containerService.listContainers());
         return "exchange-item";
     }
