@@ -302,21 +302,21 @@ public class ItemService {
         Totals.Valuable gemTotal = totals.addTotal(ItemType.gem);
         Totals.Valuable jewelryTotal = totals.addTotal(ItemType.jewelry);
         Totals.Valuable otherTotal = totals.addTotal(ItemType.other);
-        for (ItemSubType subType : Constants.GEMS) {
+        for (ItemSubType subType : Constants.Gems) {
             Totals.Valuable valuable = totals.addGem(subType);
             totalAmountAndValue(valuable, ItemType.gem, subType, container);
             gemTotal.setCount(gemTotal.getCount() + valuable.getCount());
             gemTotal.setValue(gemTotal.getValue() + valuable.getValue());
         }
 
-        for (ItemSubType subType : Constants.JEWELRY) {
+        for (ItemSubType subType : Constants.Jewelry) {
             Totals.Valuable valuable = totals.addJewelry(subType);
             totalAmountAndValue(valuable, ItemType.jewelry, subType, container);
             jewelryTotal.setCount(jewelryTotal.getCount() + valuable.getCount());
             jewelryTotal.setValue(jewelryTotal.getValue() + valuable.getValue());
         }
 
-        for (ItemSubType subType : Constants.OTHER) {
+        for (ItemSubType subType : Constants.Other) {
             Totals.Valuable valuable = totals.addOther(subType);
             totalAmountAndValue(valuable, ItemType.other, subType, container);
             otherTotal.setCount(otherTotal.getCount() + valuable.getCount());
