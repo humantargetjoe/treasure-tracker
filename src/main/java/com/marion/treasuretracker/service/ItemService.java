@@ -286,56 +286,77 @@ public class ItemService {
         return queryItems(query);
     }
 
-    public Totals collectTotals() {
-        return collectTotals(null);
+    public Total collectGrandTotals() {
+        return collectTotalForContainer(null);
     }
 
-    public Totals collectTotals(Container container) {
-        Totals totals = new Totals();
-        totals.getCoins().setTotal(totalCoinValueInGold(container));
-        totals.getCoins().setCopper(totalCoinAmount(ItemSubType.copper, container));
-        totals.getCoins().setSilver(totalCoinAmount(ItemSubType.silver, container));
-        totals.getCoins().setElectrum(totalCoinAmount(ItemSubType.electrum, container));
-        totals.getCoins().setGold(totalCoinAmount(ItemSubType.gold, container));
-        totals.getCoins().setPlatinum(totalCoinAmount(ItemSubType.platinum, container));
+    public List<Total> collectSortedTotals() {
+        List<Total> totals = new ArrayList<>();
+        List<Container> containers = containerService.listContainers();
+        for (Container container : containers) {
+            totals.add(collectTotalForContainer(container));
+        }
+        return totals;
+    }
 
-        Totals.Valuable gemTotal = totals.addTotal(ItemType.gem);
-        Totals.Valuable jewelryTotal = totals.addTotal(ItemType.jewelry);
-        Totals.Valuable otherTotal = totals.addTotal(ItemType.other);
+    public Total collectTotalForContainer(Container container) {
+        Total total = new Total();
+        total.setContainer(container);
+        total.getCoins().setTotal(totalCoinValueInGold(container));
+        total.getCoins().setCopper(totalCoinAmount(ItemSubType.copper, container));
+        total.getCoins().setSilver(totalCoinAmount(ItemSubType.silver, container));
+        total.getCoins().setElectrum(totalCoinAmount(ItemSubType.electrum, container));
+        total.getCoins().setGold(totalCoinAmount(ItemSubType.gold, container));
+        total.getCoins().setPlatinum(totalCoinAmount(ItemSubType.platinum, container));
+
+        Total.Valuable gemTotal = total.addTotal(ItemType.gem);
+        Total.Valuable jewelryTotal = total.addTotal(ItemType.jewelry);
+        Total.Valuable otherTotal = total.addTotal(ItemType.other);
         for (ItemSubType subType : Constants.Gems) {
-            Totals.Valuable valuable = totals.addGem(subType);
+            Total.Valuable valuable = total.addGem(subType);
             totalAmountAndValue(valuable, ItemType.gem, subType, container);
             gemTotal.setCount(gemTotal.getCount() + valuable.getCount());
             gemTotal.setValue(gemTotal.getValue() + valuable.getValue());
+            if (valuable.getCount() == 0) {
+                total.getGems().remove(valuable);
+            }
         }
 
         for (ItemSubType subType : Constants.Jewelry) {
-            Totals.Valuable valuable = totals.addJewelry(subType);
+            Total.Valuable valuable = total.addJewelry(subType);
             totalAmountAndValue(valuable, ItemType.jewelry, subType, container);
             jewelryTotal.setCount(jewelryTotal.getCount() + valuable.getCount());
             jewelryTotal.setValue(jewelryTotal.getValue() + valuable.getValue());
+            if (valuable.getCount() == 0) {
+                total.getJewelry().remove(valuable);
+            }
         }
 
         for (ItemSubType subType : Constants.Other) {
-            Totals.Valuable valuable = totals.addOther(subType);
+            Total.Valuable valuable = total.addOther(subType);
             totalAmountAndValue(valuable, ItemType.other, subType, container);
             otherTotal.setCount(otherTotal.getCount() + valuable.getCount());
             otherTotal.setValue(otherTotal.getValue() + valuable.getValue());
+            if (valuable.getCount() == 0) {
+                total.getOther().remove(valuable);
+            }
         }
 
-        // Add miscellaneous things to totals, like weapons that are more decorative than functional
-        Totals.Valuable valuable = totals.addOther(ItemSubType.none);
+        // Add miscellaneous things to total, like weapons that are more decorative than functional
+        Total.Valuable valuable = total.addOther(ItemSubType.none);
         valuable.setName("Weapons");
         totalAmountAndValue(valuable, ItemType.weapon, ItemSubType.none, container);
         otherTotal.setCount(otherTotal.getCount() + valuable.getCount());
         otherTotal.setValue(otherTotal.getValue() + valuable.getValue());
 
-        totals.setGrandTotal(
-                totals.getCoins().getTotal() +
+        total.setGrandTotal(
+                total.getCoins().getTotal() +
                         gemTotal.getValue() +
                         jewelryTotal.getValue() +
                         otherTotal.getValue());
-        return totals;
+        total.formatTotals();
+
+        return total;
     }
 
     public Map<ItemSubType, Item> queryCoinsInContainer(Integer containerId) throws InvalidItemException {
@@ -411,7 +432,7 @@ public class ItemService {
         addCoins(baseCoin);
     }
 
-    private void totalAmountAndValue(Totals.Valuable valuable, ItemType itemType, ItemSubType itemSubType, Container container) {
+    private void totalAmountAndValue(Total.Valuable valuable, ItemType itemType, ItemSubType itemSubType, Container container) {
         String query = null;
         if (container != null) {
             query = String.format(Queries.ITEMS_BY_TYPE_AND_SUBTYPE_IN_CONTAINER, itemType, itemSubType, container.getId());
@@ -421,7 +442,7 @@ public class ItemService {
         totalAmountAndValue(valuable, query);
     }
 
-    private void totalAmountAndValue(Totals.Valuable valuable, String query) {
+    private void totalAmountAndValue(Total.Valuable valuable, String query) {
         int total = 0;
         Float value = 0f;
         List<Item> items = queryItems(query);
@@ -430,8 +451,13 @@ public class ItemService {
             if (item.getValue() != null) {
                 total += item.getAmount();
                 value += item.getAmount() * item.getValue();
+
+                if (!valuable.getItems().containsKey(item.getName())) {
+                    valuable.getItems().put(item.getName(), new ArrayList<>());
+                }
+
                 for (int i = 0; i < item.getAmount(); ++i) {
-                    valuable.getDenominations().add(item.getValue());
+                    valuable.getItems().get(item.getName()).add(item.getValue());
                 }
             }
         }
@@ -470,13 +496,13 @@ public class ItemService {
         List<Item> items = queryItems(query);
 
         float value = 0.0f;
-        try {
-            for (Item item : items) {
+        for (Item item : items) {
+            value += convertToGold(item.getItemSubType(), item.getAmount());
+            try {
                 log.info(objectMapper.writeValueAsString(item));
-                value += convertToGold(item.getItemSubType(), item.getAmount());
+            } catch (JsonProcessingException jpEx) {
+                log.error(jpEx.getMessage());
             }
-        } catch (JsonProcessingException jpEx) {
-            log.error(jpEx.getMessage(), jpEx);
         }
 
         return value;
