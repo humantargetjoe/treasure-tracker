@@ -2,12 +2,7 @@ package com.marion.treasuretracker.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marion.treasuretracker.exceptions.InvalidItemException;
-import com.marion.treasuretracker.model.Container;
-import com.marion.treasuretracker.model.Item;
-import com.marion.treasuretracker.model.ItemSubType;
-import com.marion.treasuretracker.model.ItemType;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.marion.treasuretracker.model.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,6 +10,8 @@ import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -383,7 +380,7 @@ public class ItemServiceTest {
     }
 
     @Test(expected = InvalidItemException.class)
-    public void convertCoinDenomination_NotEnoughToConvernt() throws Exception {
+    public void convertCoinDenomination_NotEnoughToConvert() throws Exception {
         Container container = createTestContainer();
         Item item = new Item();
         item.setName("Copper Coins");
@@ -467,5 +464,39 @@ public class ItemServiceTest {
         Assert.assertEquals("incorrect amount", 70, (int) item.getAmount());
         Assert.assertEquals("incorrect amount", 30, (int) result.getAmount());
         Assert.assertNotEquals("incorrect container", item.getContainer().getId(), result.getContainer().getId());
+    }
+
+    @Test
+    public void testCoinTotalsByContainer() throws Exception {
+        Container container1 = createTestContainer(1);
+        Container container2 = createTestContainer(2);
+
+        Item item1 = new Item();
+        item1.setItemType(ItemType.coin);
+        item1.setItemSubType(ItemSubType.gold);
+        item1.setAmount(11);
+        item1.setName("Gold Coins");
+        item1.setContainer(container1);
+
+        Item item2 = new Item();
+        item2.setItemType(ItemType.coin);
+        item2.setItemSubType(ItemSubType.gold);
+        item2.setAmount(11);
+        item2.setName("Gold Coins");
+        item2.setContainer(container2);
+
+        itemService.createItem(item1);
+        itemService.createItem(item2);
+
+        List<Total> totals = itemService.collectSortedTotals();
+
+        Assert.assertEquals("incorrect amount", 11, (int) totals.get(0).getCoins().getGold());
+        Assert.assertEquals("incorrect amount", 11, (int) totals.get(1).getCoins().getGold());
+
+        log.info(objectMapper.writeValueAsString(totals.get(0)));
+        log.info(objectMapper.writeValueAsString(totals.get(1)));
+
+        Assert.assertEquals("incorrect amount", 11.0f, totals.get(0).getCoins().getTotal(), 0.01f);
+        Assert.assertEquals("incorrect amount", 11.0f, totals.get(1).getCoins().getTotal(), 0.01f);
     }
 }

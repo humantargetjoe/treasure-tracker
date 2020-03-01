@@ -6,26 +6,13 @@
 
 <div class="container">
     <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
+
     <div>
         <table class="table table-striped">
-            <caption>Coin Totals</caption>
+            <caption>Coins</caption>
             <thead>
             <tr>
-                <th>Grand Total (gp)</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td th:text="${totals.grandTotal}"></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div>
-        <table class="table table-striped">
-            <caption>Coin Totals</caption>
-            <thead>
-            <tr>
+                <th>Container</th>
                 <th>Total Coin Value (gp)</th>
                 <th>Platinum</th>
                 <th>Gold</th>
@@ -35,13 +22,14 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td th:text="${totals.coins.total}"></td>
-                <td th:text="${totals.coins.platinum}"></td>
-                <td th:text="${totals.coins.gold}"></td>
-                <td th:text="${totals.coins.electrum}"></td>
-                <td th:text="${totals.coins.silver}"></td>
-                <td th:text="${totals.coins.copper}"></td>
+            <tr th:each="total : ${totals}">
+                <td th:text="${total.container.name}"></td>
+                <td th:text="${total.coins.total}"></td>
+                <td th:text="${total.coins.platinum}"></td>
+                <td th:text="${total.coins.gold}"></td>
+                <td th:text="${total.coins.electrum}"></td>
+                <td th:text="${total.coins.silver}"></td>
+                <td th:text="${total.coins.copper}"></td>
             </tr>
             </tbody>
         </table>
@@ -49,69 +37,117 @@
 
     <div>
         <table class="table table-striped">
-            <caption>Gem Totals</caption>
+            <caption>Gems</caption>
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Total Value</th>
-                <th>Total Items</th>
-                <th>Denominations</th>
+                <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="item : ${totals.gems}">
-                <td th:text="${item.name}"></td>
-                <td th:text="${item.value}"></td>
-                <td th:text="${item.count}"></td>
-                <td th:text="${item.denominations}"></td>
+            <tr th:each="total : ${totals}">
+                <td th:text="${total.container.name}"></td>
+                <td>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Total Value</th>
+                            <th>Total Items</th>
+                            <th>Denominations</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${total.gems}">
+                            <td th:text="${item.name}"></td>
+                            <td th:text="${item.value}"></td>
+                            <td th:text="${item.count}"></td>
+                            <td th:text="${item.denominations}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
             </tr>
             </tbody>
         </table>
+
     </div>
 
 
     <div>
         <table class="table table-striped">
-            <caption>Jewelry Totals</caption>
+            <caption>Jewelry</caption>
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Total Value</th>
-                <th>Total Items</th>
-                <th>Denominations</th>
+                <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="item : ${totals.jewelry}">
-                <td th:text="${item.name}"></td>
-                <td th:text="${item.value}"></td>
-                <td th:text="${item.count}"></td>
-                <td th:text="${item.denominations}"></td>
+            <tr th:each="total : ${totals}">
+                <td th:text="${total.container.name}"></td>
+                <td>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Total Value</th>
+                            <th>Total Items</th>
+                            <th>Denominations</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${total.jewelry}">
+                            <td th:text="${item.name}"></td>
+                            <td th:text="${item.value}"></td>
+                            <td th:text="${item.count}"></td>
+                            <td th:text="${item.denominations}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
             </tr>
             </tbody>
         </table>
+
     </div>
 
     <div>
         <table class="table table-striped">
-            <caption>Other Valuables Totals</caption>
+            <caption>Other Valuables</caption>
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Total Value</th>
-                <th>Total Items</th>
-                <th>Denominations</th>
+                <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="item : ${totals.other}">
-                <td th:text="${item.name}"></td>
-                <td th:text="${item.value}"></td>
-                <td th:text="${item.count}"></td>
-                <td th:text="${item.denominations}"></td>
+            <tr th:each="total : ${totals}">
+                <td th:text="${total.container.name}"></td>
+                <td>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Total Value</th>
+                            <th>Total Items</th>
+                            <th>Denominations</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${total.other}">
+                            <td th:text="${item.name}"></td>
+                            <td th:text="${item.value}"></td>
+                            <td th:text="${item.count}"></td>
+                            <td th:text="${item.denominations}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
             </tr>
             </tbody>
         </table>
+
     </div>
 
 </div>

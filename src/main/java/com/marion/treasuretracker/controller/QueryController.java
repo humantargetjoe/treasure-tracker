@@ -1,8 +1,6 @@
 package com.marion.treasuretracker.controller;
 
 import com.marion.treasuretracker.model.Container;
-import com.marion.treasuretracker.model.ItemSubType;
-import com.marion.treasuretracker.model.Totals;
 import com.marion.treasuretracker.model.TreasureQuery;
 import com.marion.treasuretracker.service.ContainerService;
 import com.marion.treasuretracker.service.ItemService;
@@ -49,16 +47,22 @@ public class QueryController {
         return "list-items";
     }
 
-    @RequestMapping(value = "/query/totals", method = RequestMethod.GET)
+    @RequestMapping(value = "/query/total", method = RequestMethod.GET)
     public String totalGlobal(ModelMap model) {
-        model.addAttribute("totals", itemService.collectTotals());
+        model.addAttribute("total", itemService.collectGrandTotals());
+        return "total";
+    }
+
+    @RequestMapping(value = "/query/total/{id}", method = RequestMethod.GET)
+    public String totalInContainer(@PathVariable Integer id,ModelMap model) {
+        Container container = containerService.findContainerById(id);
+        model.addAttribute("totals", itemService.collectTotalForContainer(container));
         return "totals";
     }
 
-    @RequestMapping(value = "/query/totals/{id}", method = RequestMethod.GET)
-    public String totalInContainer(@PathVariable Integer id,ModelMap model) {
-        Container container = containerService.findContainerById(id);
-        model.addAttribute("totals", itemService.collectTotals(container));
+    @RequestMapping(value = "/query/totals", method = RequestMethod.GET)
+    public String totalByContainer(ModelMap model) {
+        model.addAttribute("totals", itemService.collectSortedTotals());
         return "totals";
     }
 }

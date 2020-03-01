@@ -1,9 +1,16 @@
 package com.marion.treasuretracker.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-public class Totals {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Total {
+    private static Log log = LogFactory.getLog(Total.class);
+
     public Valuable addGem(ItemSubType itemSubType) {
         Valuable gem = new Valuable();
         getGems().add(gem);
@@ -40,6 +47,18 @@ public class Totals {
         }
         total.name = "Total";
         return total;
+    }
+
+    public void formatTotals() {
+        for (Valuable valuable : getGems()) {
+            valuable.formatDenominations();
+        }
+        for (Valuable valuable : getJewelry()) {
+            valuable.formatDenominations(true);
+        }
+        for (Valuable valuable : getOther()) {
+            valuable.formatDenominations(true);
+        }
     }
 
     public Coins getCoins() {
@@ -82,11 +101,20 @@ public class Totals {
         this.grandTotal = grandTotal;
     }
 
+    public Container getContainer() {
+        return container;
+    }
+
+    public void setContainer(Container container) {
+        this.container = container;
+    }
+
     public class Valuable {
         private String name;
         private Float value = 0f;
         private Integer count = 0;
-        private List<Float> denominations = new ArrayList<>();
+        private Map<String, List<Float>> items = new HashMap<>();
+        private List<String> denominations = new ArrayList<>();
 
         public Float getValue() {
             return value;
@@ -112,12 +140,48 @@ public class Totals {
             this.name = name;
         }
 
-        public List<Float> getDenominations() {
+        public Map<String, List<Float>> getItems() {
+            return items;
+        }
+
+        public void setItems(Map<String, List<Float>> items) {
+            this.items = items;
+        }
+
+        public List<String> getDenominations() {
             return denominations;
         }
 
-        public void setDenominations(List<Float> denominations) {
+        public void setDenominations(List<String> denominations) {
             this.denominations = denominations;
+        }
+
+        protected void formatDenominations() {
+            formatDenominations(false);
+        }
+
+        protected void formatDenominations(boolean displayName) {
+            Map<Integer, Integer> countMap = new HashMap<>();
+            Map<Integer, String> nameMap = new HashMap<>();
+
+            for (Map.Entry<String, List<Float>> entry: getItems().entrySet()) {
+                for (Float itemValue: entry.getValue()) {
+                    Integer key = itemValue.intValue();
+                    if (!countMap.containsKey(key)) {
+                        countMap.put(key, 0);
+                        nameMap.put(key, entry.getKey());
+                    }
+                    countMap.put(key, countMap.get(key) + 1);
+                }
+            }
+
+            for (Map.Entry<Integer, Integer> entry : countMap.entrySet()) {
+                if (displayName) {
+                    getDenominations().add(String.format("%s: %sx %s", nameMap.get(entry.getKey()), entry.getValue(), entry.getKey()));
+                } else {
+                    getDenominations().add(String.format("%sx %s", entry.getValue(), entry.getKey()));
+                }
+            }
         }
     }
 
@@ -184,4 +248,5 @@ public class Totals {
     private List<Valuable> gems = new ArrayList<>();
     private List<Valuable> other = new ArrayList<>();
 
+    private Container container;
 }
