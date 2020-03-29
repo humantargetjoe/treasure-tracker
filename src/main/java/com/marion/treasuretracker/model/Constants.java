@@ -76,7 +76,10 @@ public class Constants {
     private static ItemSubType[] OTHER = {
             ItemSubType.unspecified,
             ItemSubType.none,
-            ItemSubType.gold
+            ItemSubType.copper,
+            ItemSubType.silver,
+            ItemSubType.gold,
+            ItemSubType.platinum
     };
 
     public static List<ItemSubType> Gems = Collections.unmodifiableList(Arrays.asList(GEMS));

@@ -60,4 +60,13 @@ public enum ItemSubType {
     nosering,
     pin,
     ring,
+
+    // Other subtypes - materials, etc.
+    bronze,
+    ivory,
+    animal,
+    plant,
+    art,
+    goods,
+    multiple,
 }

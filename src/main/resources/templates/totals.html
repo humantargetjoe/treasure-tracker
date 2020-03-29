@@ -6,6 +6,23 @@
 
 <div class="container">
     <!--/*/ <th:block th:include="fragments/navigation :: navigation"></th:block> /*/-->
+    <div>
+        <table class="table table-striped">
+            <caption>Totals</caption>
+            <thead>
+            <tr>
+                <th>Container</th>
+                <th>Total Value (gp)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="total : ${totals}">
+                <td th:text="${total.container.name}"></td>
+                <td th:text="${total.grandTotal}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
     <div>
         <table class="table table-striped">
