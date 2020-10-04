@@ -33,6 +33,9 @@ public class ItemService {
     ContainerService containerService;
 
     @Autowired
+    TagService tagService;
+
+    @Autowired
     EntityManager entityManager;
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -54,6 +57,10 @@ public class ItemService {
 
             default:
                 addItem(item);
+        }
+
+        for(String tag: item.getTags()) {
+            tagService.tagItem(tag, item);
         }
     }
 
@@ -229,6 +236,7 @@ public class ItemService {
         item.setAmount(item.getAmount() - amount);
         item.setContainer(null);
         item.getTags().add("SOLD");
+        tagService.tagItem("SOLD", item);
         itemRepository.save(item);
 
         changeLogService.recordSoldItem(item, amount, value);
@@ -261,6 +269,9 @@ public class ItemService {
         changeLogService.recordSpentItem(item, amount, description);
     }
 
+    public List<Item> queryItemsWithTag(String tag) {
+        return queryItems("");
+    }
 
     public Item findItemById(String id) {
         return findItemById(Integer.parseInt(id));
@@ -278,6 +289,13 @@ public class ItemService {
     public List<Item> queryItems(String query) {
         Query nativeQuery = entityManager.createNativeQuery(query, Item.class);
         List<Item> items = nativeQuery.getResultList();
+        for (Item item: items) {
+            item.getTags().clear();
+            List<Tag> tags = tagService.findTagsByItem(item);
+            for (Tag tag: tags) {
+                item.getTags().add(tag.getName());
+            }
+        }
         return items;
     }
 
@@ -286,11 +304,22 @@ public class ItemService {
         return queryItems(query);
     }
 
+    private void tagAllItems() {
+        List<Item> items = listItems();
+        for (Item item: items) {
+            for (String tag: item.getTags()) {
+                log.info(String.format("Tag: %s", tag));
+                tagService.tagItem(tag, item);
+            }
+        }
+    }
+
     public Total collectGrandTotals() {
         return collectTotalForContainer(null);
     }
 
     public List<Total> collectSortedTotals() {
+        tagAllItems();
         List<Total> totals = new ArrayList<>();
         List<Container> containers = containerService.listContainers();
         for (Container container : containers) {
@@ -481,11 +510,11 @@ public class ItemService {
         return total;
     }
 
-    float totalCoinValueInGold() {
+    protected float totalCoinValueInGold() {
         return totalCoinValueInGold(null);
     }
 
-    float totalCoinValueInGold(Container container) {
+    private float totalCoinValueInGold(Container container) {
         String query = null;
         if (container != null) {
             query = String.format(Queries.ITEMS_BY_TYPE_IN_CONTAINER, ItemType.coin, container.getId());

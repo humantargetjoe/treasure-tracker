@@ -2,6 +2,7 @@ package com.marion.treasuretracker.model;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "item", schema = "public")
@@ -169,7 +170,7 @@ public class Item {
         return tags;
     }
 
-    public void setTags(ArrayList tags) {
+    public void setTags(ArrayList<String> tags) {
         this.tags = tags;
     }
 

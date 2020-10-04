@@ -4,32 +4,46 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "tag", schema = "public")
+@Table(name = "itemtag", schema = "public")
 public class ItemTag implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
     @ManyToOne
     @JoinColumn
-    private Item itemId;
+    private Item item;
 
-    @Id
     @ManyToOne
     @JoinColumn
-    private Tag tagId;
+    private Tag tag;
 
-    public Item getItemId() {
-        return itemId;
+    public ItemTag() {
+
     }
 
-    public void setItemId(Item itemId) {
-        this.itemId = itemId;
+    public Integer getId() {
+        return id;
     }
 
-    public Tag getTagId() {
-        return tagId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public void setTagId(Tag tagId) {
-        this.tagId = tagId;
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item itemId) {
+        this.item = itemId;
+    }
+
+    public Tag getTag() {
+        return tag;
+    }
+
+    public void setTag(Tag tagId) {
+        this.tag = tagId;
     }
 }

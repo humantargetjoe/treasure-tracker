@@ -493,8 +493,8 @@ public class ItemServiceTest {
         Assert.assertEquals("incorrect amount", 11, (int) totals.get(0).getCoins().getGold());
         Assert.assertEquals("incorrect amount", 11, (int) totals.get(1).getCoins().getGold());
 
-        log.info(objectMapper.writeValueAsString(totals.get(0)));
-        log.info(objectMapper.writeValueAsString(totals.get(1)));
+//        log.info(objectMapper.writeValueAsString(totals.get(0)));
+//        log.info(objectMapper.writeValueAsString(totals.get(1)));
 
         Assert.assertEquals("incorrect amount", 11.0f, totals.get(0).getCoins().getTotal(), 0.01f);
         Assert.assertEquals("incorrect amount", 11.0f, totals.get(1).getCoins().getTotal(), 0.01f);
